@@ -2,33 +2,56 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Resolved Records</title>
+    <title>Record Form</title>
+
+    <!-- Include Select2 styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+
     <style>
-        /* General Styles */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f4f4f4;
+            position: relative;
         }
 
-        h1 {
-            text-align: center;
-            margin-top: 20px;
-            color: #333;
+        h2 {
+            margin-top: 0;
         }
 
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="date"],
+        select,
+        textarea,
+        input[type="text"] {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #submissionMessage {
+            margin-bottom: 10px;
+            color: green;
         }
 
         table {
@@ -37,140 +60,105 @@
             margin-top: 20px;
         }
 
-        th, td {
-            border: 1px solid #ccc;
-            padding: 10px;
+        th,
+        td {
+            padding: 8px;
             text-align: left;
+            border-bottom: 1px solid #ddd;
         }
 
-        th {
-            background-color: #007bff;
-            color: #fff;
+        .dropdown {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: inline-block;
         }
 
-        tbody tr:nth-child(even) {
-            background-color: #f2f2f2;
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            right: 0;
         }
 
-        /* Filter Controls Styles */
-        #filter-controls {
-            text-align: center;
-            margin-bottom: 20px;
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
         }
 
-        #filter-controls label,
-        #filter-controls select,
-        #filter-controls input[type="date"] {
-            margin-right: 10px;
-            margin-bottom: 10px;
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
         }
 
-        #filter-button {
-            margin-top: 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
+        .dropdown:hover .dropdown-content {
+            display: block;
         }
 
-        /* Pagination Styles */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
+        .dropdown:hover .dropbtn {
+            background-color: #3e8e41;
         }
 
-        .pagination button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 5px 10px;
-            margin: 0 5px;
-            cursor: pointer;
-        }
-
-        /* Include Select2 styles */
         .select2-container {
             width: 100% !important;
         }
+
+        #printButton {
+            background-color: rgb(0, 132, 255);
+        }
+
+        #resolutionId {
+            background-color: #f2f2f2;
+            border: 1px solid #ccc;
+        }
+        .page-one-content {
+        page-break-after: always;
+    }
+        @media print {
+            body * {
+            visibility: hidden;
+        }
+
+        .page-one-content * {
+            visibility: visible;
+        }
+
+    #labelContainer, #labelContainer * {
+        visibility: visible;
+    }
+
+    #labelContainer {
+        position: absolute;
+        width: 4in;
+        height: 1.97in;
+        left: 0;
+        top: 0;
+        padding: 0px;
+        background-color: white;
+        border: 2px solid #000;
+    }
+
+    #labelContainer h3 {
+        font-size: 18px;
+        margin-top: 0;
+    }
+
+    #labelContainer p {
+        font-size: 12px;
+        margin: 5px 0;
+    }
+
+    
+    #labelContainer a,
+    #labelContainer span.timestamp {
+        display: none;
+    }
+}
     </style>
-</head>
-<body>
-    <h1>Resolved Records</h1>
-
-    <div id="filter-controls">
-        <!-- Date Range Filter -->
-        <label for="start-date">Start Date:</label>
-        <input type="date" id="start-date">
-        <label for="end-date">End Date:</label>
-        <input type="date" id="end-date">
-        
-        <!-- Part Number Filter -->
-        <label for="part-number">Part Number:</label>
-        <select id="part-number">
-            <!-- Options will be populated dynamically using JavaScript -->
-        </select>
-
-        <!-- Batch Number Filter -->
-        <label for="batch-number">Batch Number:</label>
-        <input type="text" id="batch-number">
-
-        <!-- Bin Number Filter -->
-        <label for="bin-number">Bin Number:</label>
-        <select id="bin-number">
-            <!-- Options will be populated dynamically using JavaScript -->
-        </select>
-
-        <!-- Decision Filter -->
-        <label for="decision">Decision:</label>
-        <select id="decision">
-            <option value="Resolved">Resolved</option>
-            <option value="Scrapped">Scrapped</option>
-            <!-- Add more options if needed -->
-        </select>
-
-        <!-- Problem Type Filter -->
-        <label for="problem-type">Problem Type:</label>
-        <select id="problem-type">
-            <option value="">Select Problem Type</option>
-            <option value="Component">Component</option>
-            <option value="Physical">Physical</option>
-            <option value="Software">Software</option>
-            <!-- Add more problem types if needed -->
-        </select>
-
-        <!-- Issue Filter -->
-        <label for="issue">Issue:</label>
-        <select id="issue">
-            <!-- Options will be populated dynamically based on Problem Type -->
-        </select>
-
-        <button id="filter-button">Filter</button>
-    </div>
-
-    <!-- Table to display resolved records -->
-    <table id="resolved-records">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Part Number</th>
-                <th>Batch Number</th>
-                <th>Bin Number</th>
-                <th>Decision</th>
-                <th>Issue</th>
-                <th>Comments</th>
-            </tr>
-        </thead>
-        <tbody id="table-body">
-            <!-- Resolved records will be displayed here when the page loads -->
-        </tbody>
-    </table>
-
-    <!-- Pagination -->
-    <div class="pagination" id="pagination">
-        <!-- Pagination buttons will be added here using JavaScript -->
-    </div>
 
     <!-- Include jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -179,168 +167,258 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
     <script>
-        // Function to fetch resolved records from the server
-        async function fetchResolvedRecords() {
-            // You should replace this with your actual fetch logic
-            // Fetch resolved records from your server using AJAX or fetch
-            try {
-                const response = await fetch('/resolvedRecords');
-                if (response.ok) {
-                    const data = await response.json();
-                    // Save the data to a global variable
-                    resolvedData = data;
-                    // Display the first page of records
-                    displayRecords(1);
-                    // Create pagination buttons
-                    createPaginationButtons();
-                } else {
-                    console.error('Failed to fetch resolved records');
-                }
-            } catch (error) {
-                console.error(error);
-            }
-
-            // Load part numbers and bin numbers
-            loadPartNumbers();
-            loadBinNumbers();
-        }
-
-        // Load part numbers
-        async function loadPartNumbers() {
-            try {
-                const response = await fetch('/partNumbers');
-                if (response.ok) {
-                    const partNumbers = await response.json();
-                    const partNumberSelect = document.getElementById('part-number');
-                    partNumberSelect.innerHTML = '';
-                    partNumbers.forEach(partNumber => {
-                        const option = document.createElement('option');
-                        option.value = partNumber;
-                        option.textContent = partNumber;
-                        partNumberSelect.appendChild(option);
-                    });
-                } else {
-                    console.error('Failed to fetch part numbers');
-                }
-            } catch (error) {
-                console.error(error);
+         $(document).ready(function() {
+            $('#actionTaken').select2({
+            tags: true
+              });
+        });     
+        function passwordProtect() {
+            const password = prompt('Enter the password:');
+            if (password === 'Cervis') { 
+                // Password is correct, show the drop-down menu
+                document.getElementById('dropdownContent').style.display = 'block';
+            } else {
+                // Incorrect password, hide the drop-down menu
+                alert('Incorrect password');
+                document.getElementById('dropdownContent').style.display = 'none';
             }
         }
+        let isFormPrinted = false;
+        function printForm() {
+            const technician = $('#technician option:selected').text();
+            const date = $('#date').val();
+            const partNumber = $('#partNumber option:selected').text();
+            const issueComments = $('#issueComments').val();
+            const resolutionId = $('#resolutionId').val();
 
-        // Load bin numbers
-        async function loadBinNumbers() {
-            try {
-                const response = await fetch('/binNumbers');
-                if (response.ok) {
-                    const binNumbers = await response.json();
-                    const binNumberSelect = document.getElementById('bin-number');
-                    binNumberSelect.innerHTML = '';
-                    binNumbers.forEach(binNumber => {
-                        const option = document.createElement('option');
-                        option.value = binNumber;
-                        option.textContent = binNumber;
-                        binNumberSelect.appendChild(option);
-                    });
-                } else {
-                    console.error('Failed to fetch bin numbers');
-                }
-            } catch (error) {
-                console.error(error);
-            }
+            $('#labelTechnician').text(technician);
+            $('#labelDate').text(date);
+            $('#labelPartNumber').text(partNumber);
+            $('#labelquantity').text($('#quantity').val());
+            $('#labelIssueComments').text(issueComments);
+            $('#labelResolutionId').text(resolutionId);
+
+            $('#labelContainer').css('display', 'block');
+            window.print();
+            $('#labelContainer').css('display', 'none');
+            isFormPrinted = true;
         }
 
-        // Function to display a page of records
-        function displayRecords(pageNumber) {
-            // Calculate the start and end indices for the current page
-            const startIndex = (pageNumber - 1) * recordsPerPage;
-            const endIndex = startIndex + recordsPerPage;
+        function generateResolutionId() {
+            return 'RID-' + Date.now();
+        }
+        async function submitForm() {
+    if (!isFormPrinted) {
+        alert("Please print the form before submitting.");
+        return;
+    }
 
-            // Get the table body element
-            const tableBody = document.getElementById('table-body');
-            tableBody.innerHTML = ''; // Clear the table body
+    document.getElementById('resolutionId').value = generateResolutionId();
 
-            // Iterate over the records for the current page and populate the table
-            for (let i = startIndex; i < Math.min(endIndex, resolvedData.length); i++) {
-                const record = resolvedData[i];
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${record.date}</td>
-                    <td>${record.partNumber}</td>
-                    <td>${record.batchNumber}</td>
-                    <td>${record.binNumber}</td>
-                    <td>${record.decision}</td>
-                    <td>${record.issue}</td>
-                    <td>${record.comments}</td>
-                `;
-                tableBody.appendChild(row);
+    try {
+        const formData = new FormData(document.getElementById('recordForm'));
+        const record = {};
+        formData.forEach((value, key) => {
+            record[key] = value;
+        });
+
+        localStorage.setItem('selectedTechnician', $('#technician').val());
+
+        const response = await fetch('/saveRecord', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(record),
+        });
+
+        if (response.ok) {
+            // Store the success message in session storage
+            sessionStorage.setItem('successMessage', 'Record saved successfully!');
+            loadRecords();
+            document.getElementById('recordForm').reset();
+            $('#date').val(new Date().toISOString().split('T')[0]);
+            setTimeout(() => {
+                window.location.reload();
+            }, 0);
+        } else {
+            document.getElementById('submissionMessage').textContent = 'Failed to save record.';
+            console.error('Failed to save record', response.status, response.statusText);
+        }
+    } catch (error) {
+        console.error('An unexpected error occurred', error);
+    } finally {
+        isFormPrinted = false;
+    }
+}
+
+        //load in records
+        async function loadRecords() {
+            const response = await fetch('/records');
+            if (response.ok) {
+                const records = await response.json();
+                displayRecords(records, 'recordsTable');
+            } else {
+                console.error('Failed to fetch records');
             }
         }
-
-        // Function to create pagination buttons
-        function createPaginationButtons() {
-            const paginationDiv = document.getElementById('pagination');
-            paginationDiv.innerHTML = ''; // Clear existing buttons
-
-            // Calculate the number of pages needed based on the data length and records per page
-            const totalPages = Math.ceil(resolvedData.length / recordsPerPage);
-
-            // Create and append pagination buttons
-            for (let i = 1; i <= totalPages; i++) {
-                const button = document.createElement('button');
-                button.textContent = i;
-                button.addEventListener('click', () => {
-                    displayRecords(i);
+        // load in technicians
+        async function loadTechnicians() {
+            const response = await fetch('/technicians');
+            if (response.ok) {
+                const technicians = await response.json();
+                const technicianDropdown = $('#technician');
+                technicianDropdown.empty();
+                technicians.forEach((technician) => {
+                    technicianDropdown.append(new Option(technician.name, technician.name));
                 });
-                paginationDiv.appendChild(button);
+                technicianDropdown.select2();
+
+                const savedTechnician = localStorage.getItem('selectedTechnician');
+                if (savedTechnician) {
+                    $('#technician').val(savedTechnician).trigger('change');
+                }
+            } else {
+                console.error('Failed to fetch technicians');
             }
         }
 
-        // Attach an event listener to the filter button
-        document.getElementById('filter-button').addEventListener('click', () => {
-            filterRecords();
+        // load in part numbers
+        async function loadPartNumbers() {
+    const response = await fetch('/partNumbers');
+    if (response.ok) {
+        const partNumbers = await response.json();
+        const partNumberDropdown = $('#partNumber');
+        partNumberDropdown.empty();
+        partNumberDropdown.select2({
+            tags: true,
+            data: partNumbers.map((partNumber) => ({ id: partNumber, text: partNumber })),
         });
-
-        // Function to filter and display records
-        function filterRecords() {
-            // Retrieve filter values
-            const startDate = document.getElementById('start-date').value;
-            const endDate = document.getElementById('end-date').value;
-            const partNumber = document.getElementById('part-number').value;
-            const batchNumber = document.getElementById('batch-number').value;
-            const binNumber = document.getElementById('bin-number').value;
-            const decision = document.getElementById('decision').value;
-            const problemType = document.getElementById('problem-type').value;
-            const issue = document.getElementById('issue').value;
-
-            // Apply filters to the data
-            const filteredData = resolvedData.filter(record => {
-                return (!startDate || record.date >= startDate) &&
-                       (!endDate || record.date <= endDate) &&
-                       (!partNumber || record.partNumber.includes(partNumber)) &&
-                       (!batchNumber || record.batchNumber.includes(batchNumber)) &&
-                       (!binNumber || record.binNumber.includes(binNumber)) &&
-                       (!decision || record.decision === decision) &&
-                       (!problemType || record.problemType === problemType) &&
-                       (!issue || record.issue === issue);
+    } else {
+        console.error('Failed to fetch part numbers');
+    }
+}
+        // display records in a table
+        function displayRecords(records, tableId) {
+            const recordsTable = $('#' + tableId);
+            recordsTable.empty();
+            const headerRow = $('<tr></tr>');
+            Object.keys(records[0]).forEach((key) => {
+                const headerCell = $('<th></th>').text(key);
+                headerRow.append(headerCell);
             });
-
-            // Display the filtered records
-            displayRecords(1);
-
-            // Update pagination buttons based on filtered data
-            createPaginationButtons();
+            recordsTable.append(headerRow);
+            records.forEach((record) => {
+                const row = $('<tr></tr>');
+                Object.values(record).forEach((value) => {
+                    const cell = $('<td></td>').text(value);
+                    row.append(cell);
+                });
+                recordsTable.append(row);
+            });
         }
+        $(document).ready(() => {
+          // Set the current date and generate an initial resolution ID
+    $('#date').val(new Date().toISOString().split('T')[0]);
+    $('#resolutionId').val(generateResolutionId());
 
-        // Define the number of records per page
-        const recordsPerPage = 10;
+    // Load records, technicians, and part numbers
+    loadRecords();
+    loadTechnicians();
+    loadPartNumbers();
 
-        // Initialize the resolved data variable
-        let resolvedData = [];
+    // Check if a success message is stored in session storage
+    const successMessage = sessionStorage.getItem('successMessage');
+    if (successMessage) {
+        // Display the success message
+        document.getElementById('submissionMessage').textContent = successMessage;
 
-        // Call the fetchResolvedRecords function when the page loads
-        window.addEventListener('load', () => {
-            fetchResolvedRecords();
-        });
+        // Clear the success message from session storage
+        sessionStorage.removeItem('successMessage');
+    }
+});
     </script>
+</head>
+<body>
+    <h2>CERVIS NON-CONFORMANCE RECORD FORM</h2>
+
+    <form id="recordForm">
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required><br>
+
+        <label for="technician">Technician:</label>
+        <select id="technician" name="technician" required></select><br>
+
+        <label for="partNumber">Part Number:</label>
+        <select id="partNumber" name="partNumber" required multiple="multiple" data-tags="false"></select><br>
+
+                <br>
+        <label for="productLine">Product Line:</label>
+        <select id="productLine" name="productLine" required>
+            <option value="Smart">Smart</option>
+            <option value="Warrior">Warrior</option>
+        </select><br>
+
+        <label for="batchNumber">Batch Number:</label>
+        <input type="text" id="batchNumber" name="batchNumber"><br>
+
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" min="1" required>
+        
+        <br>
+        <label for="issue">Issue:</label>
+        <select id="issue" name="issue" required>
+            <option value="Power">Power</option>
+            <option value="Logic">Logic</option>
+            <option value="Radio">Radio</option>
+            <option value="Miscellaneous">Miscellaneous</option>
+        </select><br>
+
+        <label for="issueComments">Issue Comments:</label>
+        <textarea id="issueComments" name="issueComments" rows="4" cols="50"></textarea><br>
+
+        <label for="actionTaken">Action Taken:</label>
+        <select id="actionTaken" name="actionTaken" required multiple="multiple" data-tags="true">
+            <option value="Placed in Board NON-Conformance Location">Placed in Board NON-Conformance Location</option>
+        </select>
+        
+        <label for="resolutionId">Resolution ID:</label>
+        <input type="text" id="resolutionId" name="resolutionId" value="RID-" readonly><br>
+        
+
+        <!-- Print Button -->
+        <button type="button" id="printButton" onclick="printForm()">Print Form</button>
+
+        <!-- Submit Button -->
+        <button type="button" onclick="submitForm()">Submit</button>
+    </form>
+
+    <div id="submissionMessage"></div>
+
+    <!--Custom Print Label-->
+    <div class="page-one-content">
+    <div id="labelContainer" style="display: none;">
+        <h3>NON-CONFORMANCE</h3>
+        <p><strong>Technician:</strong> <span id="labelTechnician"></span></p>
+        <p><strong>Date:</strong> <span id="labelDate"></span></p>
+        <p><strong>Part Number:</strong> <span id="labelPartNumber"></span></p>
+        <p><strong>Quanitity:</strong><span id="labelquantity"></span></p>
+        <p><strong>Issue Comments:</strong> <span id="labelIssueComments"></span></p>
+        <p><strong>Resolution ID:</strong> <span id="labelResolutionId"></span></p>
+    </div>
+    </div>
+    <!--Dropdown Menu-->
+    <div class="dropdown">
+        <div class="dropdown">
+            <button class="dropbtn" onclick="passwordProtect()">☰</button>
+            <div class="dropdown-content" id="dropdownContent" style="display: none;">
+            <a href="/admin.html">Resolutions Page</a>
+            <a href="/addPartNumber">Add Part Number</a>
+            <a href="/addTechnician">Add Technician</a>
+            <a href="/resolved.html">Resolved</a>
+        </div>
+    </div>
+
+    <table border="1" id="recordsTable" style="display: none;"></table>
 </body>
 </html>
