@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add and Remove Bin Numbers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+        }
+
+        h3 {
+            margin-top: 20px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="submit"] {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #555;
+        }
+
+        .message {
+            font-weight: bold;
+            color: green;
+        }
+
+        .error-message {
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h2>Add and Remove Bin Numbers</h2>
+    
+    <h3>Add Bin Numbers (Comma-Separated)</h3>
+    <form id="addBinForm">
+        <label for="binNumbers">Bin Numbers (comma-separated):</label>
+        <textarea id="binNumbers" name="binNumbers" rows="4" cols="50"></textarea>
+        <input type="submit" value="Add">
+    </form>
+
+    <h3>Remove Bin Number</h3>
+    <form id="removeBinForm">
+        <label for="removeBinNumber">Bin Number:</label>
+        <select id="removeBinNumber" name="removeBinNumber">
+            <!-- Populate this dropdown with bin numbers fetched from the server -->
+        </select>
+        <input type="submit" value="Remove">
+    </form>
+
+    <script>
+        // Function to fetch and populate bin numbers in the dropdown
+        function populateBinNumbers() {
+            fetch('/binNumbers')
+                .then(response => response.json())
+                .then(data => {
+                    const removeBinNumberSelect = document.getElementById('removeBinNumber');
+                    removeBinNumberSelect.innerHTML = '';
+
+                    data.forEach(binNumber => {
+                        const option = document.createElement('option');
+                        option.value = binNumber;
+                        option.textContent = binNumber;
+                        removeBinNumberSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Failed to fetch bin numbers:', error);
+                });
+        }
+
+        // Add Bin Numbers Form Submit Handler
+        document.getElementById('addBinForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const binNumbersInput = document.getElementById('binNumbers');
+            const binNumbersText = binNumbersInput.value.trim();
+
+            if (!binNumbersText) {
+                alert('Please enter bin numbers.');
+                return;
+            }
+
+            const binNumbersArray = binNumbersText.split(',').map(binNumber => binNumber.trim());
+
+            if (binNumbersArray.length === 0) {
+                alert('Please enter valid bin numbers.');
+                return;
+            }
+
+            const successMessages = [];
+            const errorMessages = [];
+
+            binNumbersArray.forEach(binNumber => {
+                fetch('/addBinNumber', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ binNumber })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message === 'Bin number added successfully') {
+                            successMessages.push(`Added bin number: ${binNumber}`);
+                        } else {
+                            errorMessages.push(`Failed to add bin number: ${binNumber}`);
+                        }
+
+                        if (successMessages.length + errorMessages.length === binNumbersArray.length) {
+                            if (successMessages.length > 0) {
+                                alert(successMessages.join('\n'));
+                            }
+                            if (errorMessages.length > 0) {
+                                alert(errorMessages.join('\n'));
+                            }
+                            binNumbersInput.value = '';
+                            populateBinNumbers();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Failed to add bin number:', error);
+                    });
+            });
+        });
+
+        // Remove Bin Number Form Submit Handler
+        document.getElementById('removeBinForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const removeBinNumberSelect = document.getElementById('removeBinNumber');
+            const selectedBinNumber = removeBinNumberSelect.value;
+
+            if (!selectedBinNumber) {
+                alert('Please select a bin number to remove.');
+                return;
+            }
+
+            fetch('/removeBinNumber', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ binNumber: selectedBinNumber })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'Bin number removed successfully') {
+                        alert(data.message);
+                        populateBinNumbers();
+                    } else {
+                        alert('Failed to remove bin number. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to remove bin number:', error);
+                });
+        });
+
+        // Initial population of bin numbers
+        populateBinNumbers();
+    </script>
+</body>
+</html>

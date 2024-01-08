@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Page</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        button {
+            margin: 5px; /* Adjust margin for button spacing */
+            padding: 5px 10px; /* Adjust padding for button size */
+            background-color: #4CAF50; /* Green */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .print-button {
+            background: none;
+            border: none;
+            color: #007bff;
+            text-decoration: underline; 
+            cursor: pointer;
+        }
+
+        .print-button:hover {
+            color: #0056b3; 
+        }
+
+        .error-message {
+            color: red;
+        }
+
+        .success-message {
+            color: green;
+        }
+
+        .search-bar {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .search-bar input, .search-bar select {
+            margin-right: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 200px;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                visibility: hidden;
+            }
+
+            .page-one-content {
+                visibility: visible;
+            }
+
+            #labelContainer, #labelContainer * {
+                visibility: visible;
+            }
+
+            #labelContainer {
+                position: absolute;
+                width: 151.384mm; /* Approximately 4 inches in millimeters */
+                height: 74.5mm; /* Approximately 1.97 inches in millimeters */
+                left: 0;
+                top: 0;
+                padding: 0px;
+                background-color: white;
+                border: 2px solid #000;
+            }
+
+            #labelContainer h3 {
+                font-size: 25px;
+                margin-top: 0;
+            }
+
+            #labelContainer p {
+                font-size: 18px;
+                margin: 5px 0;
+            }
+
+            /* Hide URL and timestamp in the labelContainer */
+            #labelContainer a,
+            #labelContainer span.timestamp {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Resolution Page</h2>
+        <h2>Unresolved</h2>
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" id="searchResolutionId" placeholder="Search Resolution ID" oninput="searchTable('resolutionId')">
+            <input type="date" id="searchDate" placeholder="Search Date" oninput="searchTable('date')">
+            <input type="text" id="searchTechnician" placeholder="Search Technician" oninput="searchTable('technician')">
+            <input type="text" id="searchPartNumber" placeholder="Search Part Number" oninput="searchTable('partNumber')">
+            <select id="searchProductLine" onchange="searchTable('productLine')">
+                <option value="">Search Product Line</option>
+                <option value="Smart">Smart</option>
+                <option value="Warrior">Warrior</option>
+            </select>
+            <input type="text" id="searchBatchNumber" placeholder="Search Batch Number" oninput="searchTable('batchNumber')">
+            <input type="number" id="searchQuantity" placeholder="Search Quantity" oninput="searchTable('quantity')">
+            <select id="searchIssue" onchange="searchTable('issue')">
+                <option value="">Search Issue</option>
+                <option value="Power">Power</option>
+                <option value="Logic">Logic</option>
+                <option value="Radio">Radio</option>
+                <option value="Miscellaneous">Miscellaneous</option>
+            </select>
+        </div>
+        <!-- Records Table -->
+        <table id="adminRecordsTable">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll"></th>
+                    <th>Resolution ID</th>
+                    <th>Date</th>
+                    <th>Technician</th>
+                    <th>Part Number</th>
+                    <th>Product Line</th>
+                    <th>Batch Number</th>
+                    <th>Quantity</th>
+                    <th>Issue</th>
+                    <th>Issue Comments</th>
+                    <th>Actions</th>
+                    <th>Print</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Records will be populated here -->
+            </tbody>
+        </table>
+        <!-- Pagination -->
+        <div id="pagination"></div>
+        <!-- Home Link -->
+        <p><a href="/">Home</a></p>
+        <!-- Action Buttons -->
+        <div class="button-group">
+            <button id="moveToResolvedButton">Move to Resolved</button>
+            <button id="exportButton">Export to Excel</button>
+        </div>
+        <!-- Error/Success Message -->
+        <p id="message" class="error-message"></p>
+        <p id="successMessage" class="success-message" style="display: none;"></p>
+    </div>
+
+    <!-- Hidden container for printing -->
+    <div id="labelContainer" style="display: none;">
+        <h3>NON-CONFORMANCE</h3>
+        <p><strong>Technician:</strong> <span id="labelTechnician"></span></p>
+        <p><strong>Date:</strong> <span id="labelDate"></span></p>
+        <p><strong>Part Number:</strong> <span id="labelPartNumber"></span></p>
+        <p><strong>Quantity:</strong><span id="labelquantity"></span></p>
+        <p><strong>Issue Comments:</strong> <span id="labelIssueComments"></span></p>
+        <p><strong>Resolution ID:</strong> <span id="labelResolutionId"></span></p>
+    </div>
+
+
+    <!-- Add SheetJS library from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
+    <script>
+        let originalRecordsData = [];
+        let filteredRecordsData = [];
+        let currentPage = 1;
+        const recordsPerPage = 10;
+
+        // Check if there's a success message in the URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('success') && urlParams.get('success') === 'true') {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.textContent = 'Record moved to resolved successfully.';
+            successMessage.style.display = 'block';
+        }
+
+        // Load records when the DOM is ready
+        document.addEventListener('DOMContentLoaded', () => loadRecords());
+
+        // Function to print a sticker for a record
+        async function printForm(recordId) {
+            try {
+                const response = await fetch(`/getRecord/${recordId}`);
+                if (response.ok) {
+                    const selectedRecord = await response.json();
+
+                    // Populate the hidden container with data
+                    const printContainer = document.getElementById('labelContainer');
+                    printContainer.querySelector('#labelTechnician').textContent = selectedRecord.technician;
+                    printContainer.querySelector('#labelDate').textContent = selectedRecord.date;
+                    printContainer.querySelector('#labelPartNumber').textContent = selectedRecord.partNumber;
+                    printContainer.querySelector('#labelquantity').textContent = selectedRecord.quantity;
+                    printContainer.querySelector('#labelIssueComments').textContent = selectedRecord.issueComments;
+                    printContainer.querySelector('#labelResolutionId').textContent = selectedRecord.resolutionId;
+
+                    // Show the hidden container for printing
+                    printContainer.style.display = 'block';
+
+                    // Print the content
+                    window.print();
+
+                    // Hide the container again
+                    printContainer.style.display = 'none';
+                } else {
+                    alert('Record not found.');
+                }
+            } catch (error) {
+                console.error("Error fetching record:", error);
+                alert('Error fetching record.');
+            }
+        }
+
+        // Function to load records from the server
+        async function loadRecords() {
+            try {
+                const response = await fetch('/records');
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch records: ${response.status} ${response.statusText}`);
+                }
+                const records = await response.json();
+                originalRecordsData = records;
+                filteredRecordsData = records;
+                renderRecords();
+            } catch (error) {
+                console.error(error.message);
+                displayMessage(error.message, true);
+            }
+        }
+
+        // Function to render records in the table
+        function renderRecords() {
+            const startIndex = (currentPage - 1) * recordsPerPage;
+            const endIndex = startIndex + recordsPerPage;
+            const recordsToDisplay = filteredRecordsData.slice(startIndex, endIndex);
+            populateTable(recordsToDisplay);
+            renderPagination();
+        }
+
+        // Function to render pagination buttons
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredRecordsData.length / recordsPerPage);
+            const paginationElement = document.getElementById('pagination');
+            paginationElement.innerHTML = '';
+
+            if (totalPages > 1) {
+                for (let i = 1; i <= totalPages; i++) {
+                    const button = document.createElement('button');
+                    button.textContent = i;
+                    button.addEventListener('click', () => {
+                        currentPage = i;
+                        renderRecords();
+                    });
+                    paginationElement.appendChild(button);
+                }
+            }
+        }
+
+        // Function to populate the table with records
+        function populateTable(records) {
+            const tableBody = document.querySelector('#adminRecordsTable tbody');
+            tableBody.innerHTML = '';
+            records.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" value="${record.id}"></td>
+                    <td>${record.resolutionId}</td>
+                    <td>${record.date}</td>
+                    <td>${record.technician}</td>
+                    <td>${record.partNumber}</td>
+                    <td>${record.productLine}</td>
+                    <td>${record.batchNumber}</td>
+                    <td>${record.quantity}</td>
+                    <td>${record.issue}</td>
+                    <td>${record.issueComments}</td>
+                    <td>${record.actionTaken}</td>
+                    <td><span class="print-button" onclick="printForm('${record.id}')">Print</span></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Function to display a message
+        function displayMessage(message, isError) {
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = message;
+            messageElement.style.color = isError ? 'red' : 'green';
+        }
+
+        // Event listener for "Select All" checkbox
+        document.getElementById('selectAll').addEventListener('change', function () {
+            const checkboxes = document.querySelectorAll('#adminRecordsTable input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+
+        // Function to search the table
+        function searchTable(field) {
+            const searchValue = document.getElementById(`search${field.charAt(0).toUpperCase() + field.slice(1)}`).value;
+            filteredRecordsData = originalRecordsData.filter(record => {
+                if (field === 'quantity') {
+                    // Convert the search value to a number for numeric comparison
+                    const searchNumber = parseFloat(searchValue);
+                    return !isNaN(searchNumber) && record[field] === searchNumber;
+                } else {
+                    return record[field].toLowerCase().includes(searchValue.toLowerCase());
+                }
+            });
+            currentPage = 1;
+            renderRecords();
+        }
+
+        // Event listener for "Move to Resolved" button
+        document.getElementById('moveToResolvedButton').addEventListener('click', () => {
+            const selectedRecords = Array.from(document.querySelectorAll('#adminRecordsTable input[type="checkbox"]:checked'))
+                .map(cb => cb.value);
+            if (selectedRecords.length === 0) {
+                displayMessage('No records selected', true);
+                return;
+            }
+
+            // Construct the URL for resolved_form.html with the selected recordIds
+            const queryParameters = selectedRecords.map(recordId => `recordId=${recordId}`).join('&');
+            const resolvedFormURL = `/resolved_form.html?${queryParameters}`;
+
+            // Redirect to the resolved_form.html page with the selected recordIds
+            window.location.href = resolvedFormURL;
+        });
+
+        // Event listener for "Export to Excel" button
+        document.getElementById('exportButton').addEventListener('click', exportTableToExcel);
+
+        // Function to export table data to Excel
+        function exportTableToExcel() {
+            const selectedRecords = originalRecordsData;
+
+            if (selectedRecords.length > 0) {
+                const ws = XLSX.utils.json_to_sheet(selectedRecords);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Records');
+                XLSX.writeFile(wb, 'all_records.xlsx');
+            } else {
+                displayMessage('No records available for export.', true);
+            }
+        }
+    </script>
+</body>
+</html>

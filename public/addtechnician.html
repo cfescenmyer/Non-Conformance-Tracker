@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Technician</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h2 {
+            margin-top: 20px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        select {
+            width: 200px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #addTechnicianMessage {
+            margin-bottom: 10px;
+        }
+
+        #techniciansTable {
+            border-collapse: collapse;
+            margin-left: 20px;
+        }
+
+        #techniciansTable th,
+        #techniciansTable td {
+            padding: 5px;
+            border: 1px solid #ddd;
+        }
+
+        #techniciansTable th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h2>Add Technician</h2>
+    
+    <form id="technicianForm">
+        <label for="technicianName">Technician Name:</label>
+        <input type="text" id="technicianName" name="technicianName" required><br>
+        <button type="button" onclick="addTechnician()">Add Technician</button>
+    </form>
+
+    <!-- Display a message for successful addition -->
+    <div id="addTechnicianMessage" style="color: green;"></div>
+
+    <h2>Technicians</h2>
+    <table id="techniciansTable">
+        <thead>
+            <tr>
+                <th>Technician Name</th>
+            </tr>
+        </thead>
+        <tbody id="techniciansList"></tbody>
+    </table>
+
+    <h2>Remove Technician</h2>
+    <form id="removeTechnicianForm">
+        <label for="removeTechnicianName">Technician Name:</label>
+        <select id="removeTechnicianName" name="removeTechnicianName"></select>
+        <button type="button" onclick="removeTechnician()">Remove Technician</button>
+    </form>
+
+    <script>
+        async function addTechnician() {
+            const technicianName = document.getElementById('technicianName').value;
+
+            const response = await fetch('/addTechnician', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name: technicianName }),
+            });
+
+            if (response.ok) {
+                document.getElementById('addTechnicianMessage').textContent = 'Technician added successfully!';
+                loadTechnicians(); 
+                loadRemoveTechnicianOptions(); 
+                document.getElementById('technicianForm').reset();
+            } else {
+                document.getElementById('addTechnicianMessage').textContent = 'Failed to add technician.';
+                console.error('Failed to add technician');
+            }
+        }
+
+        async function loadTechnicians() {
+            const response = await fetch('/technicians');
+            if (response.ok) {
+                const technicians = await response.json();
+                const techniciansList = document.getElementById('techniciansList');
+                techniciansList.innerHTML = '';
+                technicians.forEach((technician) => {
+                    const row = document.createElement('tr');
+                    const cell = document.createElement('td');
+                    cell.textContent = technician.name;
+                    row.appendChild(cell);
+                    techniciansList.appendChild(row);
+                });
+            } else {
+                console.error('Failed to fetch technicians');
+            }
+        }
+
+        async function loadRemoveTechnicianOptions() {
+            const response = await fetch('/technicians');
+            if (response.ok) {
+                const technicians = await response.json();
+                const removeTechnicianSelect = document.getElementById('removeTechnicianName');
+                removeTechnicianSelect.innerHTML = '';
+                technicians.forEach((technician) => {
+                    const option = document.createElement('option');
+                    option.value = technician.name;
+                    option.textContent = technician.name;
+                    removeTechnicianSelect.appendChild(option);
+                });
+            } else {
+                console.error('Failed to fetch technicians for removal');
+            }
+        }
+
+        async function removeTechnician() {
+            const technicianName = document.getElementById('removeTechnicianName').value;
+
+            const response = await fetch('/removeTechnician', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ technicianName }),
+            });
+
+            if (response.ok) {
+                document.getElementById('addTechnicianMessage').textContent = 'Technician removed successfully!';
+                loadTechnicians(); // Call the function to refresh the list
+                loadRemoveTechnicianOptions(); // Refresh the options for removing technicians
+                document.getElementById('removeTechnicianForm').reset();
+            } else {
+                document.getElementById('addTechnicianMessage').textContent = 'Failed to remove technician.';
+                console.error('Failed to remove technician');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTechnicians();
+            loadRemoveTechnicianOptions();
+        });
+    </script>
+</body>
+</html>
+ <!-- home button -->
+<button type="button" onclick="goToHomePage()">Home</button>
+
+<script>
+    function goToHomePage() {
+        window.location.href = 'index.html';
+    }
+</script>

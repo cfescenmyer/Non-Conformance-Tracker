@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Part Number</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"] {
+            width: 300px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #addPartNumberMessage {
+            margin-bottom: 10px;
+        }
+
+        #searchPartNumberInput {
+            width: 300px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        button.removeButton {
+            padding: 2px 5px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button.removeButton:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <h2>Add Part Number</h2>
+
+    <form id="partNumberForm">
+        <label for="partNumber">Part Number:</label>
+        <input type="text" id="partNumber" name="partNumber" required><br>
+
+        <button type="button" onclick="addPartNumber()">Add Part Number</button>
+    </form>
+
+    <!-- Display a message for successful addition -->
+    <div id="addPartNumberMessage" style="color: green;"></div>
+
+    <h2>Part Numbers</h2>
+
+    <!-- search input for filtering part numbers -->
+    <input type="text" id="searchPartNumberInput" placeholder="Search Part Numbers" oninput="searchPartNumbers()"><br>
+
+    <ul id="partNumbersList"></ul>
+
+    <script>
+        async function addPartNumber() {
+            const partNumberInput = document.getElementById('partNumber').value;
+            const partNumbers = partNumberInput.split(',').map(partNumber => partNumber.trim());
+
+            for (const partNumber of partNumbers) {
+                const response = await fetch('/addPartNumber', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ partNumber: partNumber }),
+                });
+
+                if (response.ok) {
+                    document.getElementById('addPartNumberMessage').textContent = `Part Number(s) added successfully: ${partNumbers.join(', ')}`;
+                    loadPartNumbers();
+                    document.getElementById('partNumberForm').reset();
+                } else {
+                    document.getElementById('addPartNumberMessage').textContent = 'Failed to add Part Number.';
+                    console.error('Failed to add Part Number');
+                }
+            }
+        }
+
+        async function loadPartNumbers() {
+            const response = await fetch('/partNumbers');
+            if (response.ok) {
+                const partNumbers = await response.json();
+                const partNumbersList = document.getElementById('partNumbersList');
+                partNumbersList.innerHTML = '';
+                partNumbers.forEach((partNumber) => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = partNumber;
+
+                    //remove button
+                    const removeButton = document.createElement('button');
+                    removeButton.textContent = 'Remove';
+                    removeButton.className = 'removeButton';
+                    removeButton.onclick = function () {
+                        removePartNumber(partNumber);
+                    };
+
+                    listItem.appendChild(removeButton);
+                    partNumbersList.appendChild(listItem);
+                });
+            } else {
+                console.error('Failed to fetch part numbers');
+            }
+        }
+
+        async function removePartNumber(partNumber) {
+            const response = await fetch('/removePartNumber', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ partNumber: partNumber }),
+            });
+
+            if (response.ok) {
+                document.getElementById('addPartNumberMessage').textContent = 'Part Number removed successfully!';
+                loadPartNumbers();
+            } else {
+                document.getElementById('addPartNumberMessage').textContent = 'Failed to remove Part Number.';
+                console.error('Failed to remove Part Number');
+            }
+        }
+
+        // Function to filter part numbers 
+        function searchPartNumbers() {
+            const searchInput = document.getElementById('searchPartNumberInput').value.toLowerCase();
+            const partNumbersList = document.getElementById('partNumbersList');
+            const partNumberItems = partNumbersList.getElementsByTagName('li');
+
+            for (const item of partNumberItems) {
+                const partNumber = item.textContent.toLowerCase();
+                if (partNumber.includes(searchInput)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPartNumbers();
+        });
+    </script>
+</body>
+</html>
+<!-- Home button -->
+<button type="button" onclick="goToHomePage()">Home</button>
+
+
+<script>
+    function goToHomePage() {
+        window.location.href = 'index.html';
+    }
+</script>

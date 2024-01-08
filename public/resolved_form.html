@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Resolution Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            width: 50%;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        /* Hide elements with the "hidden" class */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h2>Resolution Form</h2>
+    <form id="resolvedForm">
+        <label for="resolutionID">Resolution ID:</label>
+        <input type="text" id="resolutionID" name="resolutionID" readonly>
+        <br><br>
+        <input type="text" id="recordId" name="recordId" style="display:none">
+        <label for="decision">Decision:</label>
+        <select id="decision" name="decision" onchange="showCommentBox()">
+            <option value="">Select Decision</option>
+            <option value="Resolve">Resolved</option>
+            <option value="Scrap">Scrapped</option>
+        </select>
+        <br><br>
+        <div id="commentBox" class="hidden">
+            <label for="scrapReason">Reason for Scrap:</label>
+            <textarea id="scrapReason" name="scrapReason" rows="4" cols="50" maxlength="150"></textarea>
+            <br><br>
+        </div>
+        <div id="resolvedDetails" class="hidden">
+            <label for="problemType">Problem Type:</label>
+            <select id="problemType" name="problemType" onchange="showIssueSection()">
+                <option value="">Select Problem Type</option>
+                <option value="Component">Component</option>
+                <option value="Physical">Physical</option>
+                <option value="Software">Software</option>
+            </select>
+            <br><br>
+            <div id="binNumberSection" class="hidden">
+                <label for="binNumber">Bin Number:</label>
+                <select id="binNumberSelect" name="binNumberSelect">
+                    <option value="">Select Bin Number</option>
+                    <!-- Bin numbers will be populated dynamically using JavaScript -->
+                </select>
+                <br><br>
+            </div>
+            <div id="realIssueSection" class="hidden">
+                <label for="realIssue">Issue:</label>
+                <select id="realIssueSelect" name="realIssueSelect">
+                    <option value="">Select Issue</option>
+                    <option value="Bad Solder">Bad Solder</option>
+                    <option value="Placed Wrong">Placed Wrong</option>
+                    <option value="Wrong Part">Wrong Part</option>
+                    <option value="Bad Part">Bad Part</option>
+                </select>
+                <br><br>
+            </div>
+            <div id="physicalIssueSection" class="hidden"> 
+                <label for="physicalIssue">What was Wrong:</label>
+                <select id="physicalIssueSelect" name="physicalIssueSelect" onchange="showCommentsSection()">
+                    <option value="">Select Physical Issue</option>
+                    <option value="Traces">Traces</option>
+                    <option value="Broken">Broken</option>
+                    <option value="Improper Usage">Improper Usage</option>
+                    <option value="Wrong Board">Wrong Board</option>
+                </select>
+                <br><br>
+            </div>
+            <div id="commentsSection" class="hidden"> <!-- Comments section -->
+                <label for="issueComment">Comments:</label>
+                <textarea id="issueComment" name="issueComment" rows="4" cols="50" maxlength="50"></textarea>
+                <br><br>
+            </div>
+        </div>
+        <input type="submit" value="Submit" id="submitButton">
+    </form>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css" rel="stylesheet" />
+    <script>
+        // Initialize Select2 for the "binNumberSelect" select element with search functionality
+        $(document).ready(function() {
+            $('#binNumberSelect').select2({
+                placeholder: "Select Bin Number",
+                allowClear: true,
+                width: '100%',
+            });
+        })
+
+        // Function to show/hide sections based on the selected decision
+        function showCommentBox() {
+            const decisionSelect = document.getElementById('decision');
+            const commentBox = document.getElementById('commentBox');
+            const resolvedDetails = document.getElementById('resolvedDetails');
+
+            if (decisionSelect.value === 'Scrap') {
+                commentBox.classList.remove('hidden');
+                resolvedDetails.classList.add('hidden');
+                document.getElementById('realIssueSection').classList.add('hidden');
+                document.getElementById('physicalIssueSection').classList.add('hidden');
+                document.getElementById('commentsSection').classList.add('hidden');
+            } else if (decisionSelect.value === 'Resolve') {
+                commentBox.classList.add('hidden');
+                resolvedDetails.classList.remove('hidden');
+                showIssueSection();
+            } else {
+                commentBox.classList.add('hidden');
+                resolvedDetails.classList.add('hidden');
+                document.getElementById('realIssueSection').classList.add('hidden');
+                document.getElementById('physicalIssueSection').classList.add('hidden');
+                document.getElementById('commentsSection').classList.add('hidden');
+            }
+        }
+
+        // Function to show/hide the bin number dropdown, issue section, and comments section based on the selected problem type
+        function showIssueSection() {
+            const problemTypeSelect = document.getElementById('problemType');
+            const binNumberSection = document.getElementById('binNumberSection');
+            const binNumberSelect = document.getElementById('binNumberSelect');
+            const realIssueSelect = document.getElementById('realIssueSection');
+            const physicalIssueSelect = document.getElementById('physicalIssueSection');
+            const commentsSection = document.getElementById('commentsSection');
+
+            if (problemTypeSelect.value === 'Component') {
+                // Fetch bin numbers from the server using an API call
+                fetch('/binNumbers')
+                    .then(response => response.json())
+                    .then(binNumbers => {
+                        // Populate the bin number dropdown with fetched data
+                        binNumberSelect.innerHTML = '<option value="">Select Bin Number</option>';
+                        binNumbers.forEach(binNumber => {
+                            const option = document.createElement('option');
+                            option.value = binNumber;
+                            option.textContent = binNumber;
+                            binNumberSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching bin numbers:', error);
+                    });
+
+                binNumberSection.classList.remove('hidden');
+                realIssueSelect.classList.remove('hidden');
+                physicalIssueSelect.classList.add('hidden');
+                commentsSection.classList.add('hidden');
+            } else if (problemTypeSelect.value === 'Physical') {
+                binNumberSelect.innerHTML = '<option value="">Select Bin Number</option>';
+                binNumberSection.classList.add('hidden');
+                realIssueSelect.classList.add('hidden');
+                physicalIssueSelect.classList.remove('hidden');
+                commentsSection.classList.add('hidden');
+            } else if (problemTypeSelect.value === 'Software') {
+                binNumberSelect.innerHTML = '<option value="">Select Bin Number</option>';
+                binNumberSection.classList.add('hidden');
+                realIssueSelect.classList.add('hidden');
+                physicalIssueSelect.classList.add('hidden');
+                commentsSection.classList.remove('hidden');
+            } else {
+                binNumberSelect.innerHTML = '<option value="">Select Bin Number</option>';
+                binNumberSection.classList.add('hidden');
+                realIssueSelect.classList.add('hidden');
+                physicalIssueSelect.classList.add('hidden');
+                commentsSection.classList.add('hidden');
+            }
+        }
+
+        // Function to show/hide the comments section based on the selected physical issue
+        function showCommentsSection() {
+            const physicalIssueSelect = document.getElementById('physicalIssueSelect');
+            const commentsSection = document.getElementById('commentsSection');
+
+            if (physicalIssueSelect.value) {
+                commentsSection.classList.remove('hidden');
+            } else {
+                commentsSection.classList.add('hidden');
+            }
+        }
+
+        // Initialize the form with the RID and Resolution ID values
+        document.addEventListener('DOMContentLoaded', function () {
+            const recordIdInput = document.getElementById('recordId');
+            const resolutionIdInput = document.getElementById('resolutionID');
+            const queryParams = new URLSearchParams(window.location.search);
+            const recordId = queryParams.get('recordId');
+
+            if (recordId !== null) {
+                // Fetch the Resolution ID from the database using an API call
+                fetch(`/getResolutionID?recordId=${recordId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        resolutionIdInput.value = data.resolutionID;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching Resolution ID:', error);
+                    });
+
+                recordIdInput.value = recordId;
+            } else {
+                // Display an error message if the recordId is missing or invalid
+                recordIdInput.value = ''; // Clear the input
+                resolutionIdInput.value = ''; // Clear the resolutionID input
+                const errorMessage = document.createElement('p');
+                errorMessage.textContent = 'Record ID is missing or invalid.';
+                errorMessage.style.color = 'red';
+                document.body.appendChild(errorMessage);
+           }
+        });
+
+        // Add an event listener for form submission
+        document.getElementById('resolvedForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission behavior
+
+            // Create an object to store form data
+            const formData = {
+                recordId: document.getElementById('recordId').value,
+                decision: document.getElementById('decision').value,
+                issueComment: document.getElementById('issueComment').value,
+                problemType: document.getElementById('problemType').value,
+                binNumber: document.getElementById('binNumberSelect').value,
+                realIssue: document.getElementById('realIssueSelect').value,
+                physicalIssue: document.getElementById('physicalIssueSelect').value,
+                scrapReason: document.getElementById('scrapReason').value
+            };
+
+            // Debugging: Log form data before sending
+            console.log('Form Data:', formData);
+
+            // Send the form data to the server using a POST request
+            fetch('/moveToResolved', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(data => {
+                // Redirect to admin.html regardless of the server response
+                window.location.href = 'admin.html';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Handle errors here
+            });
+        });
+    </script>
+</body>
+</html>
