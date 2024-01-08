@@ -121,8 +121,8 @@
                 <br><br>
             </div>
             <div id="commentsSection" class="hidden"> <!-- Comments section -->
-                <label for="issueComment">Comments:</label>
-                <textarea id="issueComment" name="issueComment" rows="4" cols="50" maxlength="50"></textarea>
+                <label for="resolvedComments">Comments:</label>
+                <textarea id="resolvedComments" name="resolvedComments" rows="4" cols="50" maxlength="50"></textarea>
                 <br><br>
             </div>
         </div>
@@ -268,7 +268,7 @@
             const formData = {
                 recordId: document.getElementById('recordId').value,
                 decision: document.getElementById('decision').value,
-                issueComment: document.getElementById('issueComment').value,
+                resolvedComments: document.getElementById('resolvedComments').value,
                 problemType: document.getElementById('problemType').value,
                 binNumber: document.getElementById('binNumberSelect').value,
                 realIssue: document.getElementById('realIssueSelect').value,

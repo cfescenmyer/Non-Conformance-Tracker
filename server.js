@@ -115,13 +115,13 @@ app.post('/removePartNumber', (req, res) => {
 
 // Handle moving records to resolved
 app.post('/moveToResolved', (req, res) => {
-    const { recordId, problemType, binNumber, realIssue, physicalIssue, decision, comments, scrapReason } = req.body;
+    const { recordId, problemType, binNumber, realIssue, physicalIssue, decision, resolvedComments, scrapReason } = req.body;
 
     // No need to validate fields here
 
     database.moveRecordToResolved(
         recordId,
-        { problemType, binNumber, realIssue, physicalIssue, decision, comments, scrapReason },
+        { problemType, binNumber, realIssue, physicalIssue, decision, resolvedComments, scrapReason },
         (err) => {
             if (err) {
                 console.error(`Failed to move record '${recordId}' to resolved:`, err);
@@ -247,6 +247,7 @@ app.post('/addPartNumber', (req, res) => {
         }
     });
 });
+
 app.get('/getResolutionID', (req, res) => {
     const { recordId } = req.query;
 

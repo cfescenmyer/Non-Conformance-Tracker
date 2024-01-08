@@ -9,9 +9,12 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
+            background-color: #f4f4f4;
         }
 
-        h2 {
+        h1 {
+            text-align: center;
+            margin-top: 20px;
             color: #333;
         }
 
@@ -19,264 +22,299 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-top: 20px;
         }
 
         th, td {
+            border: 1px solid #ccc;
             padding: 10px;
             text-align: left;
-            border-bottom: 1px solid #ccc;
         }
 
         th {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        tbody tr:nth-child(even) {
             background-color: #f2f2f2;
         }
 
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        button {
-            margin: 5px;
-            padding: 5px 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .print-button {
-            background: none;
-            border: none;
-            color: #007bff;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-
-        .print-button:hover {
-            color: #0056b3;
-        }
-
-        .error-message {
-            color: red;
-        }
-
-        .search-bar {
-            display: flex;
-            flex-wrap: wrap;
+        /* Filter Controls Styles */
+        #filter-controls {
+            text-align: center;
             margin-bottom: 20px;
-            align-items: center;
         }
 
-        .search-bar input, .search-bar select {
+        #filter-controls label,
+        #filter-controls select,
+        #filter-controls input[type="date"] {
             margin-right: 10px;
             margin-bottom: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 200px;
         }
 
-        .button-group {
+        #filter-button {
+            margin-top: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        /* Pagination Styles */
+        .pagination {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            margin: 0 5px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Resolution Page</h2>
-        <h2>Resolved</h2> <!-- Updated heading to show "Resolved" records -->
-        <!-- Search Bar -->
-        <div class="search-bar">
-            <input type="text" id="searchResolutionId" placeholder="Search Resolution ID" oninput="searchTable('resolutionId')">
-            <input type="text" id="searchDate" placeholder="Search Date" oninput="searchTable('date')">
-            <input type="text" id="searchTechnician" placeholder="Search Technician" oninput="searchTable('technician')">
-            <input type="text" id="searchPartNumber" placeholder="Search Part Number" oninput="searchTable('partNumber')">
-            <select id="searchProductLine" onchange="searchTable('productLine')">
-                <option value="">Search Product Line</option>
-                <option value="Smart">Smart</option>
-                <option value="Warrior">Warrior</option>
-            </select>
-            <input type="text" id="searchBatchNumber" placeholder="Search Batch Number" oninput="searchTable('batchNumber')">
-            <input type="text" id="searchQuantity" placeholder="Search Quantity" oninput="searchTable('quantity')">
-            <select id="searchIssue" onchange="searchTable('issue')">
-                <option value="">Search Issue</option>
-                <option value="Power">Power</option>
-                <option value="Logic">Logic</option>
-                <option value="Radio">Radio</option>
-                <option value="Miscellaneous">Miscellaneous</option>
-            </select>
-        </div>
-        <!-- Records Table -->
-        <table id="ResolvedRecordsTable">
-            <thead>
-                <tr>
-                    <th><input type="checkbox" id="selectAll"></th>
-                    <th>Resolution ID</th>
-                    <th>Date</th>
-                    <th>Technician</th>
-                    <th>Part Number</th>
-                    <th>Product Line</th>
-                    <th>Batch Number</th>
-                    <th>Quantity</th>
-                    <th>Issue</th>
-                    <th>Issue Comments</th>
-                    <th>Resolution Steps</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Records will be populated here -->
-            </tbody>
-        </table>
-        <!-- Pagination or table pages -->
-        <div id="pagination"></div>
-        <!-- Home Link -->
-        <p><a href="/">Home</a></p>
-        <!-- Buttons -->
-        <div class="button-group">
-            <button id="exportButton">Export to Excel</button>
-        </div>
-        <!-- Error/Success Message -->
-        <p id="message" class="error-message"></p>
+    <h1>Resolved Records</h1>
+
+    <div id="filter-controls">
+        <!-- Date Range Filter -->
+        <label for="start-date">Start Date:</label>
+        <input type="date" id="start-date">
+        <label for="end-date">End Date:</label>
+        <input type="date" id="end-date">
+        
+        <!-- Part Number Filter -->
+        <label for="part-number">Part Number:</label>
+        <select id="part-number">
+            <!-- Options will be populated dynamically using JavaScript -->
+        </select>
+
+        <!-- Batch Number Filter -->
+        <label for="batch-number">Batch Number:</label>
+        <input type="text" id="batch-number">
+
+        <!-- Bin Number Filter -->
+        <label for="bin-number">Bin Number:</label>
+        <select id="bin-number">
+            <!-- Options will be populated dynamically using JavaScript -->
+        </select>
+
+        <!-- Decision Filter -->
+        <label for="decision">Decision:</label>
+        <select id="decision">
+            <option value="Resolved">Resolved</option>
+            <option value="Scrapped">Scrapped</option>
+            <!-- Add more options if needed -->
+        </select>
+
+        <!-- Problem Type Filter -->
+        <label for="problem-type">Problem Type:</label>
+        <select id="problem-type">
+            <option value="">Select Problem Type</option>
+            <option value="Component">Component</option>
+            <option value="Physical">Physical</option>
+            <option value="Software">Software</option>
+            <!-- Add more problem types if needed -->
+        </select>
+
+        <!-- Issue Filter -->
+        <label for="issue">Issue:</label>
+        <select id="issue">
+            <!-- Options will be populated dynamically based on Problem Type -->
+        </select>
+
+        <button id="filter-button">Filter</button>
     </div>
 
-    <!-- Custom Label -->
-    <div id="labelContainer" style="display: none;">
-        <h3>NON-CONFORMANCE</h3>
-        <p><strong>Technician:</strong> <span id="labelTechnician"></span></p>
-        <p><strong>Date:</strong> <span id="labelDate"></span></p>
-        <p><strong>Part Number:</strong> <span id="labelPartNumber"></span></p>
-        <p><strong>Quantity:</strong><span id="labelquantity"></span></p>
-        <p><strong>Issue Comments:</strong> <span id="labelIssueComments"></span></p>
-        <p><strong>Resolution ID:</strong> <span id="labelResolutionId"></span></p>
+    <!-- Table to display resolved records -->
+    <table id="resolved-records">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Part Number</th>
+                <th>Batch Number</th>
+                <th>Bin Number</th>
+                <th>Decision</th>
+                <th>Issue</th>
+                <th>Comments</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+            <!-- Resolved records will be displayed here when the page loads -->
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination" id="pagination">
+        <!-- Pagination buttons will be added here using JavaScript -->
     </div>
 
-    <!-- Add SheetJS library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
     <script>
-        let originalRecordsData = [];
-        let filteredRecordsData = [];
-        let currentPage = 1;
+        // Function to fetch resolved records from the server
+        async function fetchResolvedRecords() {
+            // You should replace this with your actual fetch logic
+            // Fetch resolved records from your server using AJAX or fetch
+            try {
+                const response = await fetch('/resolvedRecords');
+                if (response.ok) {
+                    const data = await response.json();
+                    // Save the data to a global variable
+                    resolvedData = data;
+                    // Display the first page of records
+                    displayRecords(1);
+                    // Create pagination buttons
+                    createPaginationButtons();
+                } else {
+                    console.error('Failed to fetch resolved records');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+
+            // Load part numbers and bin numbers
+            loadPartNumbers();
+            loadBinNumbers();
+        }
+
+        // Load part numbers
+        async function loadPartNumbers() {
+            try {
+                const response = await fetch('/partNumbers');
+                if (response.ok) {
+                    const partNumbers = await response.json();
+                    const partNumberSelect = document.getElementById('part-number');
+                    partNumberSelect.innerHTML = '';
+                    partNumbers.forEach(partNumber => {
+                        const option = document.createElement('option');
+                        option.value = partNumber;
+                        option.textContent = partNumber;
+                        partNumberSelect.appendChild(option);
+                    });
+                } else {
+                    console.error('Failed to fetch part numbers');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // Load bin numbers
+        async function loadBinNumbers() {
+            try {
+                const response = await fetch('/binNumbers');
+                if (response.ok) {
+                    const binNumbers = await response.json();
+                    const binNumberSelect = document.getElementById('bin-number');
+                    binNumberSelect.innerHTML = '';
+                    binNumbers.forEach(binNumber => {
+                        const option = document.createElement('option');
+                        option.value = binNumber;
+                        option.textContent = binNumber;
+                        binNumberSelect.appendChild(option);
+                    });
+                } else {
+                    console.error('Failed to fetch bin numbers');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // Call the fetchResolvedRecords function when the page loads
+        window.addEventListener('load', fetchResolvedRecords);
+
+        // Sample data for pagination
+        let resolvedData = []; // Store the fetched data
+
+        // Number of records per page
         const recordsPerPage = 10;
 
-        // Load records when the DOM is ready
-        document.addEventListener('DOMContentLoaded', () => loadRecords());
-
-        // Function to load resolved records from the server
-        async function loadRecords() {
-            try {
-                const response = await fetch('/resolvedRecords'); 
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch resolved records: ${response.status} ${response.statusText}`);
-                }
-                const records = await response.json();
-                originalRecordsData = records;
-                filteredRecordsData = records;
-                renderRecords();
-            } catch (error) {
-                console.error(error.message);
-                displayMessage(error.message, true);
-            }
-        }
-
-        // Function to render records in the table
-        function renderRecords() {
-            const startIndex = (currentPage - 1) * recordsPerPage;
+        // Function to display a page of records
+        function displayRecords(page) {
+            const startIndex = (page - 1) * recordsPerPage;
             const endIndex = startIndex + recordsPerPage;
-            const recordsToDisplay = filteredRecordsData.slice(startIndex, endIndex);
-            populateTable(recordsToDisplay);
-            renderPagination();
-        }
+            const tableBody = document.querySelector('#table-body');
+            tableBody.innerHTML = ''; // Clear existing rows
 
-        // Function to render pagination buttons
-        function renderPagination() {
-            const totalPages = Math.ceil(filteredRecordsData.length / recordsPerPage);
-            const paginationElement = document.getElementById('pagination');
-            paginationElement.innerHTML = '';
-
-            if (totalPages > 1) {
-                for (let i = 1; i <= totalPages; i++) {
-                    const button = document.createElement('button');
-                    button.textContent = i;
-                    button.addEventListener('click', () => {
-                        currentPage = i;
-                        renderRecords();
-                    });
-                    paginationElement.appendChild(button);
-                }
-            }
-        }
-
-        // Function to populate the table with records
-        function populateTable(records) {
-            const tableBody = document.querySelector('#ResolvedRecordsTable tbody');
-            tableBody.innerHTML = '';
-            records.forEach(record => {
+            for (let i = startIndex; i < endIndex && i < resolvedData.length; i++) {
+                const record = resolvedData[i];
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td><input type="checkbox" value="${record.id}"></td>
-                    <td>${record.resolutionId}</td>
                     <td>${record.date}</td>
-                    <td>${record.technician}</td>
                     <td>${record.partNumber}</td>
-                    <td>${record.productLine}</td>
                     <td>${record.batchNumber}</td>
-                    <td>${record.quantity}</td>
-                    <td>${record.issue}</td>
-                    <td>${record.issueComments}</td>
-                    <td>${record.resolutionComment}</td>
+                    <td>${record.binNumber}</td>
+                    <td>${record.decision}</td>
+                    <td>${record.realIssue}${record.physicalIssue}</td>
+                    <td>${record.scrapReason}${record.resolvedComments}</td>
                 `;
                 tableBody.appendChild(row);
-            });
-        }
-
-        // Function to display a message
-        function displayMessage(message, isError) {
-            const messageElement = document.getElementById('message');
-            messageElement.textContent = message;
-            messageElement.style.color = isError ? 'red' : 'green';
-        }
-
-        // Event listener for "Select All" checkbox
-        document.getElementById('selectAll').addEventListener('change', function () {
-            const checkboxes = document.querySelectorAll('#ResolvedRecordsTable input[type="checkbox"]');
-            checkboxes.forEach(cb => cb.checked = this.checked);
-        });
-
-        // Function to search the table
-        function searchTable(field) {
-            const searchValue = document.getElementById(`search${field.charAt(0).toUpperCase() + field.slice(1)}`).value.toLowerCase();
-            filteredRecordsData = originalRecordsData.filter(record => record[field].toLowerCase().includes(searchValue));
-            currentPage = 1;
-            renderRecords();
-        }
-
-        // Event listener for "Export to Excel" button
-        document.getElementById('exportButton').addEventListener('click', exportTableToExcel);
-
-        // Function to export table data to Excel
-        function exportTableToExcel() {
-            const selectedRecords = originalRecordsData;
-
-            if (selectedRecords.length > 0) {
-                const ws = XLSX.utils.json_to_sheet(selectedRecords);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Records');
-                XLSX.writeFile(wb, 'all_records.xlsx');
-            } else {
-                displayMessage('No records available for export.', true);
             }
+        }
+
+        // Function to create pagination buttons
+        function createPaginationButtons() {
+            const pagination = document.querySelector('#pagination');
+            pagination.innerHTML = ''; // Clear existing buttons
+            const totalPages = Math.ceil(resolvedData.length / recordsPerPage);
+
+            for (let page = 1; page <= totalPages; page++) {
+                const button = document.createElement('button');
+                button.textContent = page;
+                button.addEventListener('click', () => {
+                    displayRecords(page);
+                });
+                pagination.appendChild(button);
+            }
+        }
+
+        // Attach event listener to the filter button
+        document.getElementById('filter-button').addEventListener('click', filterAndDisplayRecords);
+
+        // Function to filter and display records
+        function filterAndDisplayRecords() {
+            // Retrieve filter criteria (startDate, endDate, etc.) from the input fields
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const partNumber = document.getElementById('part-number').value;
+            const batchNumber = document.getElementById('batch-number').value;
+            const binNumber = document.getElementById('bin-number').value;
+            const decision = document.getElementById('decision').value;
+            const issue = document.getElementById('issue').value;
+            const problemType = document.getElementById('problem-type').value;
+
+            // Filter the records based on the criteria
+            // You can implement your filter logic here
+            const filteredData = resolvedData.filter(record => {
+                // Implement your filter criteria here
+                // For example, compare record.startDate with startDate, etc.
+                return true; // Modify this condition as needed
+            });
+
+            // Update the displayed records with the filtered data
+            resolvedData = filteredData;
+
+            // Redisplay the first page of records with pagination
+            displayRecords(1);
+            createPaginationButtons();
         }
     </script>
 </body>

@@ -1,1 +1,9 @@
-To start to Non-Conformance Tracker Database after a server restart or shutdown, navigate to the file located on the C: drive known as Board NC Tracker. After located the folder, press on the directory PATH and open the cmd from that folder. In the command prompt type “node server.js” and it will read “Server is running at http://localhost:3005.” Alternatively you can highlight that directory path and type “node server.js” directly from the folder and it will run Node.js. 
+To start to Non-Conformance Tracker Database after a server restart 
+or shutdown, navigate to the file located on the C: drive known as 
+Board NC Tracker. After located the folder, press on the directory PATH 
+and open the cmd from that folder. In the command prompt 
+type “node server.js” and it will read 
+“Server is running at http://localhost:3005.” 
+Alternatively you can highlight that directory path 
+and type “node server.js” directly from the folder 
+and it will run Node.js. 
