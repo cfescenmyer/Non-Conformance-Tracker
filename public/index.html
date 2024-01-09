@@ -350,7 +350,7 @@
         <select id="technician" name="technician" required></select><br>
 
         <label for="partNumber">Part Number:</label>
-        <select id="partNumber" name="partNumber" required multiple="multiple" data-tags="false"></select><br>
+        <select id="partNumber" name="partNumber" required multiple="multiple" data-tags="true"></select><br>
 
                 <br>
         <label for="productLine">Product Line:</label>
@@ -378,7 +378,7 @@
         <textarea id="issueComments" name="issueComments" rows="4" cols="50"></textarea><br>
 
         <label for="actionTaken">Action Taken:</label>
-        <select id="actionTaken" name="actionTaken" required multiple="multiple" data-tags="true">
+        <select id="actionTaken" name="actionTaken" required>
             <option value="Placed in Board NON-Conformance Location">Placed in Board NON-Conformance Location</option>
         </select>
         
@@ -413,12 +413,16 @@
             <button class="dropbtn" onclick="passwordProtect()">☰</button>
             <div class="dropdown-content" id="dropdownContent" style="display: none;">
             <a href="/admin.html">Resolutions Page</a>
-            <a href="/addPartNumber">Add Part Number</a>
-            <a href="/addTechnician">Add Technician</a>
             <a href="/resolved.html">Resolved</a>
+            <a href="/addTechnician">Add Technician</a>
+            <a href="/addPartNumber">Add Part Number</a>
+            <a href="/addbinnumber.html">Add Bin Number</a>   
         </div>
     </div>
 
     <table border="1" id="recordsTable" style="display: none;"></table>
 </body>
+<footer>
+
+</footer>
 </html>

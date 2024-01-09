@@ -153,10 +153,8 @@ function getRecordById(recordId, callback) {
   db.get(sql, [recordId], (err, record) => {
     if (err) {
       callback(err, null);
-    } else {
-      callback(null, record);
     }
-  });
+    });
 }
 
 // Function to get the resolution ID by record ID

@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Resolved Page</title>
+    <!-- Include Select2 styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
     <style>
         /* General Styles */
         body {
@@ -10,6 +12,23 @@
             margin: 0;
             padding: 20px;
             background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #homeButton {
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 20px;
+
+        }
+        #homeButton:hover {
+            background-color: #3e8e41;
         }
 
         h1 {
@@ -52,28 +71,6 @@
             background-color: #f2f2f2;
         }
 
-        /* Filter Controls Styles */
-        #filter-controls {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        #filter-controls label,
-        #filter-controls select,
-        #filter-controls input[type="date"] {
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-
-        #filter-button {
-            margin-top: 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-
         /* Pagination Styles */
         .pagination {
             display: flex;
@@ -89,59 +86,77 @@
             margin: 0 5px;
             cursor: pointer;
         }
+
+        .pagination button:hover {
+            background-color: #0069d9;
+        }
+
+        /* Adjust the width of the Select2 dropdown */
+        .select2 {
+            width: 100%;
+            color: #333;
+        }
+        
     </style>
 </head>
 <body>
     <h1>Resolved Records</h1>
 
-    <div id="filter-controls">
-        <!-- Date Range Filter -->
-        <label for="start-date">Start Date:</label>
-        <input type="date" id="start-date">
-        <label for="end-date">End Date:</label>
-        <input type="date" id="end-date">
-        
-        <!-- Part Number Filter -->
-        <label for="part-number">Part Number:</label>
-        <select id="part-number">
-            <!-- Options will be populated dynamically using JavaScript -->
+    <!-- Filter Table Button -->
+    <button id="filterTableButton">Filtering Options</button>
+
+    <!-- Filter Options (Initially Hidden) -->
+    <div id="filterOptions" style="display: none;">
+        <!-- Filter by Date Range -->
+        <label for="filterDateRange">Date Range:</label>
+        <input type="date" id="startDate" placeholder="Start Date">
+        <input type="date" id="endDate" placeholder="End Date">        
+        <p></p>
+
+        <!-- Filter by Part Number -->
+        <label for="filterPartNumber">Part Number:</label>
+        <select id="filterPartNumber" class="select2">
+            <option value="">Select Part Number</option>
+            <!-- Part Numbers will be populated here using JavaScript -->
         </select>
 
-        <!-- Batch Number Filter -->
-        <label for="batch-number">Batch Number:</label>
-        <input type="text" id="batch-number">
-
-        <!-- Bin Number Filter -->
-        <label for="bin-number">Bin Number:</label>
-        <select id="bin-number">
-            <!-- Options will be populated dynamically using JavaScript -->
+        <!-- Filter by Bin Number -->
+        <label for="filterBinNumber">Bin Number:</label>
+        <select id="filterBinNumber" class="select2">
+            <option value="">Select Bin Number</option>
+            <!-- Bin Numbers will be populated here using JavaScript -->
         </select>
 
-        <!-- Decision Filter -->
-        <label for="decision">Decision:</label>
-        <select id="decision">
-            <option value="Resolved">Resolved</option>
-            <option value="Scrapped">Scrapped</option>
-            <!-- Add more options if needed -->
+        <!-- Filter by Decision (Select2) -->
+        <label for="filterDecision">Decision:</label>
+        <select id="filterDecision" class="select2">
+            <option value="">Select Decision</option>
+            <option value="Resolve">Resolved</option>
+            <option value="Scrap">Scrapped</option>
+            <!-- Add more decision options as needed -->
         </select>
 
-        <!-- Problem Type Filter -->
-        <label for="problem-type">Problem Type:</label>
-        <select id="problem-type">
+        <!-- Filter by Problem Type (Select2) -->
+        <label for="filterProblemType">Problem Type:</label>
+        <select id="filterProblemType" class="select2">
             <option value="">Select Problem Type</option>
             <option value="Component">Component</option>
             <option value="Physical">Physical</option>
             <option value="Software">Software</option>
-            <!-- Add more problem types if needed -->
+            <!-- Add more problem type options as needed -->
         </select>
 
-        <!-- Issue Filter -->
-        <label for="issue">Issue:</label>
-        <select id="issue">
-            <!-- Options will be populated dynamically based on Problem Type -->
+        <!-- Filter by Issue -->
+        <label for="filterIssue">Issue:</label>
+        <select id="filterIssue" class="select2">
+            <option value="">Select Issue</option>
+            <!-- Issue options will be populated here using JavaScript -->
         </select>
 
-        <button id="filter-button">Filter</button>
+        <!-- Filter Button -->
+        <button id="filterButton">Filter</button>
+        <!-- Clear Filters Button -->
+        <button id="clearFiltersButton">Clear Filters</button>
     </div>
 
     <!-- Table to display resolved records -->
@@ -151,9 +166,10 @@
                 <th>Date</th>
                 <th>Part Number</th>
                 <th>Batch Number</th>
-                <th>Bin Number</th>
                 <th>Decision</th>
+                <th>Problem Type</th>
                 <th>Issue</th>
+                <th>Bin Number</th>
                 <th>Comments</th>
             </tr>
         </thead>
@@ -166,72 +182,88 @@
     <div class="pagination" id="pagination">
         <!-- Pagination buttons will be added here using JavaScript -->
     </div>
+    <a href="index.html" id="homeButton">Home</a>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
     <script>
-        // Function to fetch resolved records from the server
+        // Function to toggle filter options display
+        function toggleFilterOptions() {
+            const filterOptions = document.getElementById('filterOptions');
+            if (filterOptions.style.display === 'none') {
+                filterOptions.style.display = 'block';
+            } else {
+                filterOptions.style.display = 'none';
+            }
+        }
+
+        // Add event listener to the "Filter Table" button
+        document.getElementById('filterTableButton').addEventListener('click', toggleFilterOptions);
+
+        // Function to fetch resolved records from the server with additional filters
         async function fetchResolvedRecords() {
-            // You should replace this with your actual fetch logic
-            // Fetch resolved records from your server using AJAX or fetch
             try {
-                const response = await fetch('/resolvedRecords');
-                if (response.ok) {
-                    const data = await response.json();
-                    // Save the data to a global variable
-                    resolvedData = data;
-                    // Display the first page of records
+                // Fetch resolved records from your server using AJAX or fetch
+                const resolvedResponse = await fetch('/resolvedRecords');
+                const partNumbersResponse = await fetch('/partNumbers'); // Replace with your API endpoint for part numbers
+                const binNumbersResponse = await fetch('/binNumbers'); // Replace with your API endpoint for bin numbers
+
+                if (resolvedResponse.ok && partNumbersResponse.ok && binNumbersResponse.ok) {
+                    const resolvedData = await resolvedResponse.json();
+                    const partNumbersData = await partNumbersResponse.json();
+                    const binNumbersData = await binNumbersResponse.json();
+
+                    // Save the resolved data and part/bin numbers data to global variables
+                    resolvedDataGlobal = resolvedData;
+                    partNumbersGlobal = partNumbersData;
+                    binNumbersGlobal = binNumbersData;
+
+                    // Populate the part number and bin number filters
+                    populateSelectOptions('filterPartNumber', partNumbersGlobal);
+                    populateSelectOptions('filterBinNumber', binNumbersGlobal);
+
+                    // Initialize Select2 for the Part Number and Bin Number dropdowns
+                    // Enable search for the Part Number dropdown
+                    $('#filterPartNumber').select2({
+                        width: '100%',
+                        dropdownAutoWidth: true,
+                        placeholder: 'Select Part Number',
+                        allowClear: true,
+                    });
+
+                    $('#filterBinNumber').select2({
+                        width: '100%',
+                        dropdownAutoWidth: true,
+                        placeholder: 'Select Bin Number',
+                        allowClear: true,
+                    });
+
+                    // Initialize Select2 for Decision dropdown
+                    $('#filterDecision').select2({
+                        width: '100%',
+                        dropdownAutoWidth: true,
+                        placeholder: 'Select Decision',
+                        allowClear: true,
+                    });
+
+                    // Initialize Select2 for Problem Type dropdown
+                    $('#filterProblemType').select2({
+                        width: '100%',
+                        dropdownAutoWidth: true,
+                        placeholder: 'Select Problem Type',
+                        allowClear: true,
+                    });
+
+                    // Populate the Issue filter options
+                    populateIssueOptions();
+
+                    // Display the first page of records with all filters initially
                     displayRecords(1);
                     // Create pagination buttons
-                    createPaginationButtons();
+                    createPaginationButtons(1);
                 } else {
-                    console.error('Failed to fetch resolved records');
-                }
-            } catch (error) {
-                console.error(error);
-            }
-
-            // Load part numbers and bin numbers
-            loadPartNumbers();
-            loadBinNumbers();
-        }
-
-        // Load part numbers
-        async function loadPartNumbers() {
-            try {
-                const response = await fetch('/partNumbers');
-                if (response.ok) {
-                    const partNumbers = await response.json();
-                    const partNumberSelect = document.getElementById('part-number');
-                    partNumberSelect.innerHTML = '';
-                    partNumbers.forEach(partNumber => {
-                        const option = document.createElement('option');
-                        option.value = partNumber;
-                        option.textContent = partNumber;
-                        partNumberSelect.appendChild(option);
-                    });
-                } else {
-                    console.error('Failed to fetch part numbers');
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        }
-
-        // Load bin numbers
-        async function loadBinNumbers() {
-            try {
-                const response = await fetch('/binNumbers');
-                if (response.ok) {
-                    const binNumbers = await response.json();
-                    const binNumberSelect = document.getElementById('bin-number');
-                    binNumberSelect.innerHTML = '';
-                    binNumbers.forEach(binNumber => {
-                        const option = document.createElement('option');
-                        option.value = binNumber;
-                        option.textContent = binNumber;
-                        binNumberSelect.appendChild(option);
-                    });
-                } else {
-                    console.error('Failed to fetch bin numbers');
+                    console.error('Failed to fetch data');
                 }
             } catch (error) {
                 console.error(error);
@@ -242,10 +274,114 @@
         window.addEventListener('load', fetchResolvedRecords);
 
         // Sample data for pagination
-        let resolvedData = []; // Store the fetched data
+        let resolvedDataGlobal = []; // Store the fetched data
+        let partNumbersGlobal = []; // Store part numbers data
+        let binNumbersGlobal = []; // Store bin numbers data
 
         // Number of records per page
         const recordsPerPage = 10;
+
+        // Initialize filters object
+        const filters = {
+            partNumber: '',
+            binNumber: '',
+            startDate: '',
+            endDate: '',
+            decision: '',
+            issue: '',
+            problemType: ''
+        };
+
+        // Function to populate select options
+        function populateSelectOptions(selectId, data) {
+            const selectElement = document.getElementById(selectId);
+
+            // Clear existing options
+            selectElement.innerHTML = '';
+
+            // Add default "Select" option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = `Select ${selectId === 'filterPartNumber' ? 'Part' : 'Bin'} Number`;
+            selectElement.appendChild(defaultOption);
+
+            // Add options based on the fetched data
+            data.forEach((item) => {
+                const option = document.createElement('option');
+                option.value = item;
+                option.textContent = item;
+                selectElement.appendChild(option);
+            });
+
+            // Initialize Select2
+            $(selectElement).select2({
+                width: '100%',
+            });
+        }
+
+        // Function to populate the Issue filter options
+        function populateIssueOptions() {
+            const issueSelect = document.getElementById('filterIssue');
+            issueSelect.innerHTML = ''; // Clear existing options
+
+            const issues = [...new Set([...resolvedDataGlobal.map(record => record.realIssue), ...resolvedDataGlobal.map(record => record.physicalIssue)])];
+
+            issues.forEach((issue) => {
+                const option = document.createElement('option');
+                option.value = issue;
+                option.textContent = issue;
+                issueSelect.appendChild(option);
+            });
+
+            // Initialize Select2 for the Issue dropdown
+            $('#filterIssue').select2({
+                width: '100%',
+                dropdownAutoWidth: true,
+                placeholder: 'Select Issue',
+                allowClear: true,
+            });
+        }
+
+        // Function to calculate total pages
+        function calculateTotalPages(data) {
+            return Math.ceil(data.length / recordsPerPage);
+        }
+
+        // Function to create pagination buttons
+        function createPaginationButtons(currentPage, totalPages) {
+            const paginationContainer = document.getElementById('pagination');
+            paginationContainer.innerHTML = '';
+
+            // Create Previous button
+            const prevButton = document.createElement('button');
+            prevButton.textContent = 'Previous';
+            prevButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    displayRecords(currentPage - 1);
+                }
+            });
+            paginationContainer.appendChild(prevButton);
+
+            // Create page number buttons
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                pageButton.addEventListener('click', () => {
+                    displayRecords(i);
+                });
+                paginationContainer.appendChild(pageButton);
+            }
+
+            // Create Next button
+            const nextButton = document.createElement('button');
+            nextButton.textContent = 'Next';
+            nextButton.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    displayRecords(currentPage + 1);
+                }
+            });
+            paginationContainer.appendChild(nextButton);
+        }
 
         // Function to display a page of records
         function displayRecords(page) {
@@ -254,68 +390,88 @@
             const tableBody = document.querySelector('#table-body');
             tableBody.innerHTML = ''; // Clear existing rows
 
-            for (let i = startIndex; i < endIndex && i < resolvedData.length; i++) {
-                const record = resolvedData[i];
+            // Filter records based on the selected criteria from the dropdowns and date inputs
+            const filteredData = resolvedDataGlobal.filter((record) => {
+                return (!filters.partNumber || record.partNumber.includes(filters.partNumber)) &&
+                       (!filters.binNumber || record.binNumber.includes(filters.binNumber)) &&
+                       (!filters.startDate || new Date(record.date) >= new Date(filters.startDate)) &&
+                       (!filters.endDate || new Date(record.date) <= new Date(filters.endDate)) &&
+                       (!filters.decision || record.decision === filters.decision) &&
+                       (!filters.issue || record.realIssue === filters.issue || record.physicalIssue === filters.issue) &&
+                       (!filters.problemType || record.problemType === filters.problemType);
+            });
+
+            for (let i = startIndex; i < endIndex && i < filteredData.length; i++) {
+                const record = filteredData[i];
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${record.date}</td>
                     <td>${record.partNumber}</td>
                     <td>${record.batchNumber}</td>
-                    <td>${record.binNumber}</td>
                     <td>${record.decision}</td>
+                    <td>${record.problemType}</td>
                     <td>${record.realIssue}${record.physicalIssue}</td>
-                    <td>${record.scrapReason}${record.resolvedComments}</td>
+                    <td>${record.binNumber}</td>
+                    <td>${record.resolvedComments}${record.scrapReason}</td>
                 `;
                 tableBody.appendChild(row);
             }
+
+            // Calculate total pages and update pagination buttons
+            const totalPages = calculateTotalPages(filteredData);
+            createPaginationButtons(page, totalPages);
         }
 
-        // Function to create pagination buttons
-        function createPaginationButtons() {
-            const pagination = document.querySelector('#pagination');
-            pagination.innerHTML = ''; // Clear existing buttons
-            const totalPages = Math.ceil(resolvedData.length / recordsPerPage);
+        // Add event listener to the "Filter" button
+        document.getElementById('filterButton').addEventListener('click', () => {
+            // Call the updateTable function when the "Filter" button is pressed
+            updateTable();
+        });
 
-            for (let page = 1; page <= totalPages; page++) {
-                const button = document.createElement('button');
-                button.textContent = page;
-                button.addEventListener('click', () => {
-                    displayRecords(page);
-                });
-                pagination.appendChild(button);
-            }
+        // Function to update the table based on selected filters
+        function updateTable() {
+            // Update the filters object with selected filter values
+            filters.partNumber = document.getElementById('filterPartNumber').value;
+            filters.binNumber = document.getElementById('filterBinNumber').value;
+            filters.startDate = document.getElementById('startDate').value;
+            filters.endDate = document.getElementById('endDate').value;
+            filters.decision = document.getElementById('filterDecision').value;
+            filters.issue = document.getElementById('filterIssue').value;
+            filters.problemType = document.getElementById('filterProblemType').value;
+
+            // Call the displayRecords function to refresh the table with filtered data
+            displayRecords(1); // Display the first page of filtered records
         }
+        // Add event listener to the "Clear Filters" button
+        document.getElementById('clearFiltersButton').addEventListener('click', () => {
+            // Reset all filter fields to their default values
+            document.getElementById('filterPartNumber').value = '';
+            document.getElementById('filterBinNumber').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('filterDecision').value = '';
+            document.getElementById('filterIssue').value = '';
+            document.getElementById('filterProblemType').value = '';
 
-        // Attach event listener to the filter button
-        document.getElementById('filter-button').addEventListener('click', filterAndDisplayRecords);
+            // Reset the Select2 selections to their default values
+            $('#filterPartNumber').val('').trigger('change');
+            $('#filterBinNumber').val('').trigger('change');
+            $('#filterDecision').val('').trigger('change');
+            $('#filterProblemType').val('').trigger('change');
+            $('#filterIssue').val('').trigger('change');
 
-        // Function to filter and display records
-        function filterAndDisplayRecords() {
-            // Retrieve filter criteria (startDate, endDate, etc.) from the input fields
-            const startDate = document.getElementById('start-date').value;
-            const endDate = document.getElementById('end-date').value;
-            const partNumber = document.getElementById('part-number').value;
-            const batchNumber = document.getElementById('batch-number').value;
-            const binNumber = document.getElementById('bin-number').value;
-            const decision = document.getElementById('decision').value;
-            const issue = document.getElementById('issue').value;
-            const problemType = document.getElementById('problem-type').value;
+            // Reset the filters object to default values
+            filters.partNumber = '';
+            filters.binNumber = '';
+            filters.startDate = '';
+            filters.endDate = '';
+            filters.decision = '';
+            filters.issue = '';
+            filters.problemType = '';
 
-            // Filter the records based on the criteria
-            // You can implement your filter logic here
-            const filteredData = resolvedData.filter(record => {
-                // Implement your filter criteria here
-                // For example, compare record.startDate with startDate, etc.
-                return true; // Modify this condition as needed
-            });
-
-            // Update the displayed records with the filtered data
-            resolvedData = filteredData;
-
-            // Redisplay the first page of records with pagination
-            displayRecords(1);
-            createPaginationButtons();
-        }
-    </script>
+            // Call the updateTable function to refresh the table with cleared filters
+            updateTable();
+        });
+</script>
 </body>
 </html>

@@ -260,6 +260,7 @@
            }
         });
 
+
         // Add an event listener for form submission
         document.getElementById('resolvedForm').addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent the default form submission behavior
@@ -270,11 +271,23 @@
                 decision: document.getElementById('decision').value,
                 resolvedComments: document.getElementById('resolvedComments').value,
                 problemType: document.getElementById('problemType').value,
-                binNumber: document.getElementById('binNumberSelect').value,
-                realIssue: document.getElementById('realIssueSelect').value,
-                physicalIssue: document.getElementById('physicalIssueSelect').value,
-                scrapReason: document.getElementById('scrapReason').value
+                binNumber: '',
+                realIssue: '',
+                physicalIssue: '',
+                scrapReason: ''
             };
+
+            // Check the selected decision and problem type
+            if (formData.decision === 'Resolve') {
+                if (formData.problemType === 'Component') {
+                    formData.binNumber = document.getElementById('binNumberSelect').value;
+                    formData.realIssue = document.getElementById('realIssueSelect').value;
+                } else if (formData.problemType === 'Physical') {
+                    formData.physicalIssue = document.getElementById('physicalIssueSelect').value;
+                }
+            } else if (formData.decision === 'Scrap') {
+                formData.scrapReason = document.getElementById('scrapReason').value;
+            }
 
             // Debugging: Log form data before sending
             console.log('Form Data:', formData);
