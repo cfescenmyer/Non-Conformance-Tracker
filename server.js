@@ -117,22 +117,9 @@ app.post('/removePartNumber', (req, res) => {
 app.post('/moveToResolved', (req, res) => {
     const { recordId, problemType, binNumber, realIssue, physicalIssue, decision, resolvedComments, scrapReason } = req.body;
 
-    // No need to validate fields here
 
     //If record ID is located within the resolved records table then return an error
-    database.getRecordById(recordId, (err, record) => {
-        if (err) {
-            console.error(`Failed to fetch record with ID ${recordId} from the database`);
-            res.sendStatus(500);
-            return; 
-        }
-        else{
-            console.log('Record already exists in resolved records');
-        }
-    });
 
-    console.log("TESTTTTTT");
-    
     database.moveRecordToResolved(
         recordId,
         { problemType, binNumber, realIssue, physicalIssue, decision, resolvedComments, scrapReason },

@@ -17,18 +17,29 @@
             align-items: center;
             justify-content: center;
         }
-        #homeButton {
-            text-decoration: none;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: #fff;
-            border-radius: 5px;
-            font-weight: bold;
-            margin: 20px;
 
+        /* Export Buttons Styles */
+        #exportButtonsContainer {
+            display: flex; 
+            margin: 10px;
         }
-        #homeButton:hover {
-            background-color: #3e8e41;
+
+        #exportFilteredDataButton, #exportAllDataButton {
+            background-color: #4CAF50; /* Green color */
+            color: #fff;
+            border: none;
+            padding: 5px 10px; /* Smaller padding */
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 3px; /* Rounded corners */
+        }
+        #exportFilteredDataButton {
+            margin-right: 10px;
+            justify-content: left;
+        }
+
+        #homeButton {
+            padding: 20px;
         }
 
         h1 {
@@ -184,8 +195,22 @@
     </div>
     <a href="index.html" id="homeButton">Home</a>
 
+</body>
+<main>
+        <!-- Export Filtered Data Button -->
+    <div id="exportButtonsContainer" style="display: flex; justify-content: left;">
+        <!-- Export Filtered Data Button -->
+        <button id="exportFilteredDataButton">Export Filtered Data to Excel</button>
+
+        <!-- Export All Data Button -->
+        <button id="exportAllDataButton" style="display: block; justify-content: right;">Export All Data to Excel</button>
+    </div>
+</main>
+
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+
 
     <script>
         // Function to toggle filter options display
@@ -258,10 +283,17 @@
                     // Populate the Issue filter options
                     populateIssueOptions();
 
-                    // Display the first page of records with all filters initially
-                    displayRecords(1);
+                    // Calculate total pages for all records
+                    const totalPages = calculateTotalPages(resolvedDataGlobal);
+
+                    // Create pagination buttons for all records
+                    createPaginationButtons(1, totalPages);
+
                     // Create pagination buttons
                     createPaginationButtons(1);
+
+                    // Display the first page of resolved records
+                    displayRecords(1);
                 } else {
                     console.error('Failed to fetch data');
                 }
@@ -422,56 +454,98 @@
             createPaginationButtons(page, totalPages);
         }
 
-        // Add event listener to the "Filter" button
-        document.getElementById('filterButton').addEventListener('click', () => {
-            // Call the updateTable function when the "Filter" button is pressed
-            updateTable();
-        });
+            // Add event listener to the "Filter" button
+            document.getElementById('filterButton').addEventListener('click', () => {
+                // Call the updateTable function when the "Filter" button is pressed
+                updateTable();
+            });
 
-        // Function to update the table based on selected filters
-        function updateTable() {
-            // Update the filters object with selected filter values
-            filters.partNumber = document.getElementById('filterPartNumber').value;
-            filters.binNumber = document.getElementById('filterBinNumber').value;
-            filters.startDate = document.getElementById('startDate').value;
-            filters.endDate = document.getElementById('endDate').value;
-            filters.decision = document.getElementById('filterDecision').value;
-            filters.issue = document.getElementById('filterIssue').value;
-            filters.problemType = document.getElementById('filterProblemType').value;
+            // Function to update the table based on selected filters
+            function updateTable() {
+                // Update the filters object with selected filter values
+                filters.partNumber = document.getElementById('filterPartNumber').value;
+                filters.binNumber = document.getElementById('filterBinNumber').value;
+                filters.startDate = document.getElementById('startDate').value;
+                filters.endDate = document.getElementById('endDate').value;
+                filters.decision = document.getElementById('filterDecision').value;
+                filters.issue = document.getElementById('filterIssue').value;
+                filters.problemType = document.getElementById('filterProblemType').value;
 
-            // Call the displayRecords function to refresh the table with filtered data
-            displayRecords(1); // Display the first page of filtered records
-        }
-        // Add event listener to the "Clear Filters" button
-        document.getElementById('clearFiltersButton').addEventListener('click', () => {
-            // Reset all filter fields to their default values
-            document.getElementById('filterPartNumber').value = '';
-            document.getElementById('filterBinNumber').value = '';
-            document.getElementById('startDate').value = '';
-            document.getElementById('endDate').value = '';
-            document.getElementById('filterDecision').value = '';
-            document.getElementById('filterIssue').value = '';
-            document.getElementById('filterProblemType').value = '';
+                // Call the displayRecords function to refresh the table with filtered data
+                displayRecords(1); // Display the first page of filtered records
+            }
+            // Add event listener to the "Clear Filters" button
+            document.getElementById('clearFiltersButton').addEventListener('click', () => {
+                // Reset all filter fields to their default values
+                document.getElementById('filterPartNumber').value = '';
+                document.getElementById('filterBinNumber').value = '';
+                document.getElementById('startDate').value = '';
+                document.getElementById('endDate').value = '';
+                document.getElementById('filterDecision').value = '';
+                document.getElementById('filterIssue').value = '';
+                document.getElementById('filterProblemType').value = '';
 
-            // Reset the Select2 selections to their default values
-            $('#filterPartNumber').val('').trigger('change');
-            $('#filterBinNumber').val('').trigger('change');
-            $('#filterDecision').val('').trigger('change');
-            $('#filterProblemType').val('').trigger('change');
-            $('#filterIssue').val('').trigger('change');
+                // Reset the Select2 selections to their default values
+                $('#filterPartNumber').val('').trigger('change');
+                $('#filterBinNumber').val('').trigger('change');
+                $('#filterDecision').val('').trigger('change');
+                $('#filterProblemType').val('').trigger('change');
+                $('#filterIssue').val('').trigger('change');
 
-            // Reset the filters object to default values
-            filters.partNumber = '';
-            filters.binNumber = '';
-            filters.startDate = '';
-            filters.endDate = '';
-            filters.decision = '';
-            filters.issue = '';
-            filters.problemType = '';
+                // Reset the filters object to default values
+                filters.partNumber = '';
+                filters.binNumber = '';
+                filters.startDate = '';
+                filters.endDate = '';
+                filters.decision = '';
+                filters.issue = '';
+                filters.problemType = '';
 
-            // Call the updateTable function to refresh the table with cleared filters
-            updateTable();
-        });
+                // Call the updateTable function to refresh the table with cleared filters
+                updateTable();
+            });
+
+            // Function to export filtered data to Excel
+            function exportFilteredDataToExcel() {
+                const filteredData = getFilteredData();
+                if (filteredData.length > 0) {
+                    const workbook = XLSX.utils.book_new();
+                    const worksheet = XLSX.utils.json_to_sheet(filteredData);
+                    XLSX.utils.book_append_sheet(workbook, worksheet, 'FilteredData');
+                    XLSX.writeFile(workbook, 'filtered_data.xlsx');
+                } else {
+                    alert('No filtered data to export.');
+                }
+            }
+
+            // Function to export all data to Excel
+            function exportAllDataToExcel() {
+                if (resolvedDataGlobal.length > 0) {
+                    const workbook = XLSX.utils.book_new();
+                    const worksheet = XLSX.utils.json_to_sheet(resolvedDataGlobal);
+                    XLSX.utils.book_append_sheet(workbook, worksheet, 'AllData');
+                    XLSX.writeFile(workbook, 'all_data.xlsx');
+                } else {
+                    alert('No data to export.');
+                }
+            }
+
+            // Add event listeners to the export buttons
+            document.getElementById('exportFilteredDataButton').addEventListener('click', exportFilteredDataToExcel);
+            document.getElementById('exportAllDataButton').addEventListener('click', exportAllDataToExcel);
+
+            // Function to get filtered data based on current filters
+            function getFilteredData() {
+                return resolvedDataGlobal.filter((record) => {
+                    return (!filters.partNumber || record.partNumber.includes(filters.partNumber)) &&
+                        (!filters.binNumber || record.binNumber.includes(filters.binNumber)) &&
+                        (!filters.startDate || new Date(record.date) >= new Date(filters.startDate)) &&
+                        (!filters.endDate || new Date(record.date) <= new Date(filters.endDate)) &&
+                        (!filters.decision || record.decision === filters.decision) &&
+                        (!filters.issue || record.realIssue === filters.issue || record.physicalIssue === filters.issue) &&
+                        (!filters.problemType || record.problemType === filters.problemType);
+                });
+            }
+
 </script>
-</body>
 </html>
