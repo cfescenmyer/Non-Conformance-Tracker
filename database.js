@@ -1,9 +1,12 @@
+// Import necessary modules
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
+// Create a connection to the SQLite database
 const dbPath = path.resolve(__dirname, 'database.db');
 const db = new sqlite3.Database(dbPath);
 
+// Define the database schema without the removed fields
 db.run(`
   CREATE TABLE IF NOT EXISTS records (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,6 +44,7 @@ db.run(`
   )
 `);
 
+// Updated the 'resolvedRecords' table schema to exclude the removed fields
 db.run(`
   CREATE TABLE IF NOT EXISTS resolvedRecords (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -64,14 +68,14 @@ db.run(`
   )
 `);
 
-// function to insert a record into the 'records' table
+// Original function to insert a record into the 'records' table
 const insertRecord = (record, callback) => {
   const { date, technician, partNumber, productLine, batchNumber, quantity, issue, issueComments, actionTaken, resolutionId } = record;
   const sql = 'INSERT INTO records (date, technician, partNumber, productLine, batchNumber, quantity, issue, issueComments, actionTaken, resolutionId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
   db.run(sql, [date, technician, partNumber, productLine, batchNumber, quantity, issue, issueComments, actionTaken, resolutionId], callback);
 };
 
-// function to get all records from the 'records' table
+// Original function to get all records from the 'records' table
 const getAllRecords = (callback) => {
   const sql = 'SELECT * FROM records';
   db.all(sql, callback);
@@ -86,8 +90,8 @@ function moveRecordToResolved(recordId, newRecord, callback) {
     realIssue,
     physicalIssue,
     decision,
-    resolvedComments, 
-    scrapReason 
+    resolvedComments, // Added field
+    scrapReason // Added field
   } = newRecord;
 
   const selectSql = 'SELECT * FROM records WHERE id = ?';
@@ -165,10 +169,10 @@ const getResolutionIDByRecordID = (recordId, callback) => {
       if (row) {
         callback(null, row.resolutionId);
       } else {
-        callback(null, null); 
+        callback(null, null); // Record not found
+      }
     }
-    }
-  })
+  });
 };
 
 // Function to add a technician
