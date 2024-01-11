@@ -129,7 +129,7 @@ app.post('/moveToResolved', (req, res) => {
                 res.status(500).send('Failed to move record to resolved');
             } else {
                 console.log(`Record '${recordId}' moved to resolved`);
-                res.sendStatus(200); // OK
+                res.sendStatus(200); 
             }
         }
     );

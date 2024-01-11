@@ -56,7 +56,6 @@
             background-color: #0056b3;
         }
 
-        /* Hide elements with the "hidden" class */
         .hidden {
             display: none;
         }
@@ -251,8 +250,8 @@
                 recordIdInput.value = recordId;
             } else {
                 // Display an error message if the recordId is missing or invalid
-                recordIdInput.value = ''; // Clear the input
-                resolutionIdInput.value = ''; // Clear the resolutionID input
+                recordIdInput.value = ''; 
+                resolutionIdInput.value = ''; 
                 const errorMessage = document.createElement('p');
                 errorMessage.textContent = 'Record ID is missing or invalid.';
                 errorMessage.style.color = 'red';
@@ -263,8 +262,8 @@
 
         // Add an event listener for form submission
         document.getElementById('resolvedForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent the default form submission behavior
-
+            event.preventDefault();
+            
             // Create an object to store form data
             const formData = {
                 recordId: document.getElementById('recordId').value,

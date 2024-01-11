@@ -171,8 +171,8 @@
 
             if (response.ok) {
                 document.getElementById('addTechnicianMessage').textContent = 'Technician removed successfully!';
-                loadTechnicians(); // Call the function to refresh the list
-                loadRemoveTechnicianOptions(); // Refresh the options for removing technicians
+                loadTechnicians(); 
+                loadRemoveTechnicianOptions(); 
                 document.getElementById('removeTechnicianForm').reset();
             } else {
                 document.getElementById('addTechnicianMessage').textContent = 'Failed to remove technician.';

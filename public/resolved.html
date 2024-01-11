@@ -6,7 +6,6 @@
     <!-- Include Select2 styles -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
     <style>
-        /* General Styles */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -18,7 +17,6 @@
             justify-content: center;
         }
 
-        /* Export Buttons Styles */
         #exportButtonsContainer {
             display: flex; 
             margin: 10px;
@@ -82,7 +80,6 @@
             background-color: #f2f2f2;
         }
 
-        /* Pagination Styles */
         .pagination {
             display: flex;
             justify-content: center;
@@ -248,7 +245,6 @@
                     populateSelectOptions('filterPartNumber', partNumbersGlobal);
                     populateSelectOptions('filterBinNumber', binNumbersGlobal);
 
-                    // Initialize Select2 for the Part Number and Bin Number dropdowns
                     // Enable search for the Part Number dropdown
                     $('#filterPartNumber').select2({
                         width: '100%',
@@ -306,9 +302,9 @@
         window.addEventListener('load', fetchResolvedRecords);
 
         // Sample data for pagination
-        let resolvedDataGlobal = []; // Store the fetched data
-        let partNumbersGlobal = []; // Store part numbers data
-        let binNumbersGlobal = []; // Store bin numbers data
+        let resolvedDataGlobal = []; 
+        let partNumbersGlobal = []; 
+        let binNumbersGlobal = []; 
 
         // Number of records per page
         const recordsPerPage = 10;
@@ -354,7 +350,7 @@
         // Function to populate the Issue filter options
         function populateIssueOptions() {
             const issueSelect = document.getElementById('filterIssue');
-            issueSelect.innerHTML = ''; // Clear existing options
+            issueSelect.innerHTML = ''; 
 
             const issues = [...new Set([...resolvedDataGlobal.map(record => record.realIssue), ...resolvedDataGlobal.map(record => record.physicalIssue)])];
 
@@ -420,7 +416,7 @@
             const startIndex = (page - 1) * recordsPerPage;
             const endIndex = startIndex + recordsPerPage;
             const tableBody = document.querySelector('#table-body');
-            tableBody.innerHTML = ''; // Clear existing rows
+            tableBody.innerHTML = ''; 
 
             // Filter records based on the selected criteria from the dropdowns and date inputs
             const filteredData = resolvedDataGlobal.filter((record) => {

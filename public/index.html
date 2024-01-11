@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Record Form</title>
+
     <!-- Include Select2 styles -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0px;
+            padding: 20px;
             position: relative;
-            margin: 20px;
         }
 
         h2 {
@@ -139,6 +140,9 @@
         padding: 0px;
         background-color: white;
         border: 2px solid #000;
+        overflow: hidden;
+        page-break-after: always;
+        max-height: 100%;
     }
 
     #labelContainer h3 {
@@ -156,8 +160,9 @@
     #labelContainer span.timestamp {
         display: none;
     }
-    }
+}
     </style>
+
 <header>
     <img src="/Cervis Primary Logo 2022 - PMS186 - FLAT - Transparent (1).png" alt="Cervis Logo" height="66.4" width="300">
 </header>
@@ -408,7 +413,6 @@
          });
      }
      $(document).ready(() => {
-       // Set the current date and generate an initial resolution ID
  $('#date').val(new Date().toISOString().split('T')[0]);
  $('#resolutionId').val(generateResolutionId());
 
